@@ -3,27 +3,1618 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>呼吸 — 粒子动态</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;900&display=swap" rel="stylesheet" />
+  <title>声之雪花 · 声音交互艺术</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0a0a0a;
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    main {
-      box-shadow: 0 0 60px rgba(255,255,255,0.06);
+
+    body {
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 50%, #0a0e1a 0%, #050810 50%, #020408 100%);
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      cursor: none;
+    }
+
+    .layout {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 0;
+    }
+
+    .stage {
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      position: relative;
+      z-index: 30;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      pointer-events: auto;
+      user-select: none;
+      padding: 1.25rem;
+      border-right: 1px solid rgba(184, 212, 232, 0.12);
+      background: linear-gradient(180deg, rgba(10, 14, 26, 0.55), rgba(5, 8, 16, 0.25));
+    }
+
+    .panel {
+      background: rgba(10, 14, 26, 0.55);
+      border: 1px solid rgba(184, 212, 232, 0.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 0.7rem 0.75rem;
+      color: rgba(220, 235, 255, 0.85);
+    }
+
+    .panel-title {
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      color: rgba(200, 220, 255, 0.75);
+      margin-bottom: 0.5rem;
+    }
+
+    .mini {
+      width: 100%;
+      height: 86px;
+      display: block;
+      border: 1px solid rgba(184, 212, 232, 0.14);
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    #panelAudio.hot {
+      border-color: rgba(255, 150, 140, 0.35);
+      box-shadow:
+        0 0 0 1px rgba(255, 150, 140, 0.12),
+        0 0 24px rgba(255, 150, 140, 0.12);
+    }
+
+    .pill.big {
+      font-size: 0.92rem;
+      letter-spacing: 0.12em;
+      padding: 0.2rem 0.55rem;
+      color: rgba(245, 250, 255, 0.92);
+      border-color: rgba(220, 235, 255, 0.28);
+      background: rgba(184, 212, 232, 0.12);
+    }
+
+    .mini.video {
+      height: 96px;
+      object-fit: cover;
+      border: 1px solid rgba(184, 212, 232, 0.14);
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .cam-wrap {
+      position: relative;
+      width: 100%;
+      height: 96px;
+      border: 1px solid rgba(184, 212, 232, 0.14);
+      background: rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .cam-wrap > video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: none;
+      background: transparent;
+    }
+
+    .cam-wrap > canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .btn.small {
+      padding: 0.45rem 0.6rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: rgba(210, 230, 255, 0.75);
+    }
+
+    .pill {
+      padding: 0.15rem 0.45rem;
+      border: 1px solid rgba(184, 212, 232, 0.22);
+      color: rgba(220, 235, 255, 0.85);
+      background: rgba(184, 212, 232, 0.08);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .critique {
+      font-size: 3.2rem;
+      line-height: 1.0;
+      letter-spacing: 0.1em;
+      color: rgba(245, 250, 255, 0.99);
+      min-height: 3.0em;
+      text-align: center;
+      text-shadow:
+        0 0 18px rgba(180, 220, 255, 0.25),
+        0 0 40px rgba(150, 200, 255, 0.18);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      color: rgba(220, 235, 255, 0.9);
+      background: rgba(184, 212, 232, 0.08);
+      border: 1px solid rgba(184, 212, 232, 0.25);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(184, 212, 232, 0.14);
+      border-color: rgba(184, 212, 232, 0.42);
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .saved-list {
+      margin-top: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      max-height: 160px;
+      overflow: auto;
+      padding-right: 0.25rem;
+    }
+
+    .thumb {
+      border: 1px solid rgba(184, 212, 232, 0.16);
+      background: rgba(0,0,0,0.12);
+      height: 70px;
+      width: 100%;
+      display: block;
+    }
+
+    .thumb-meta {
+      margin-top: 0.25rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: rgba(200, 220, 255, 0.65);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 740px) {
+      .layout {
+        grid-template-columns: 300px 1fr;
+      }
+      .sidebar { padding: 0.75rem; }
+    }
+    .ui {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .hint {
+      color: rgba(200, 220, 255, 0.7);
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+
+    .volume-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .volume-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7eb8da, #b8d4e8);
+      border-radius: 2px;
+      transition: width 0.05s ease-out;
+    }
+
+    .status {
+      position: absolute;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      z-index: 10;
+    }
+
+    .status.ready {
+      color: rgba(180, 220, 255, 0.9);
+    }
+
+    .btn-start {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      padding: 1rem 2.5rem;
+      font-family: inherit;
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      color: #b8d4e8;
+      background: transparent;
+      border: 1px solid rgba(184, 212, 232, 0.5);
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .btn-start:hover {
+      background: rgba(184, 212, 232, 0.1);
+      border-color: rgba(184, 212, 232, 0.9);
+      color: #fff;
+    }
+
+    .btn-start.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <main></main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-  <script src="sketch.js"></script>
+  <div class="layout">
+    <aside class="sidebar">
+      <section class="panel" id="panelCam">
+        <div class="panel-title">摄像头 · 手势交互</div>
+        <div class="cam-wrap">
+          <video id="camVideo" autoplay muted playsinline></video>
+          <canvas id="camFx"></canvas>
+        </div>
+        <div class="row" style="margin-top: 0.45rem;">
+          <span>手势</span>
+          <span class="pill" id="handPill">—</span>
+        </div>
+        <button class="btn small" id="btnCam" style="margin-top: 0.5rem;">开启摄像头</button>
+      </section>
+
+      <section class="panel" id="panelAudio">
+        <div class="panel-title">声学观察</div>
+        <div class="row" style="margin-bottom: 0.45rem;">
+          <span>来源</span>
+          <span class="pill" id="sourcePill">麦克风</span>
+        </div>
+        <canvas class="mini" id="miniMeter" width="440" height="160"></canvas>
+        <div class="row" style="margin-top: 0.45rem;">
+          <span>响度</span>
+          <span class="pill big" id="loudnessPill">0%</span>
+        </div>
+        <div class="row" style="margin-top: 0.3rem;">
+          <span>当前分贝</span>
+          <span class="pill big" id="dbPill">— dB</span>
+        </div>
+      </section>
+
+      <section class="panel" id="panelCritique">
+        <div class="panel-title">声音批评</div>
+        <div class="critique" id="critiqueText">等待声音…</div>
+        <div class="row" style="margin-top: 0.5rem;">
+          <span>清晰度</span>
+          <span class="pill" id="clarityPill">—</span>
+        </div>
+      </section>
+
+      <section class="panel" id="panelSave">
+        <div class="panel-title">雪花样式库</div>
+        <button class="btn" id="btnSave">保存当前雪花样式</button>
+        <div class="saved-list" id="savedList"></div>
+      </section>
+    </aside>
+
+    <main class="stage" id="stage">
+      <canvas id="canvas"></canvas>
+      <p class="status" id="status">点击下方按钮，允许麦克风后开始</p>
+      <button class="btn-start" id="btnStart">开启声音艺术</button>
+      <div class="ui">
+        <p class="hint">声音越大 · 小雪花聚集成大雪花</p>
+        <div class="volume-bar">
+          <div class="volume-fill" id="volumeFill"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const stage = document.getElementById('stage');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const statusEl = document.getElementById('status');
+      const btnStart = document.getElementById('btnStart');
+      const volumeFill = document.getElementById('volumeFill');
+      const miniMeter = document.getElementById('miniMeter');
+      const meterCtx = miniMeter.getContext('2d');
+      const loudnessPill = document.getElementById('loudnessPill');
+      const dbPill = document.getElementById('dbPill');
+      const critiqueText = document.getElementById('critiqueText');
+      const clarityPill = document.getElementById('clarityPill');
+      const btnSave = document.getElementById('btnSave');
+      const savedList = document.getElementById('savedList');
+      const camVideo = document.getElementById('camVideo');
+      const btnCam = document.getElementById('btnCam');
+      const handPill = document.getElementById('handPill');
+      const camFx = document.getElementById('camFx');
+      const camFxDrawCtx = camFx.getContext('2d');
+
+      let width, height, centerX, centerY;
+      let particles = [];
+      const PARTICLE_COUNT = 2500; // 大幅增加粒子数量，更密集
+      let volume = 0;
+      let smoothVolume = 0;
+      let formation = 0; // 0 = 散开, 1 = 雪花形态
+      let snowflakePoints = [];
+      let audioContext = null;
+      let analyser = null;
+      let stream = null;
+      let animationId = null;
+      let started = false;
+      let time = 0; // 用于动画时间
+      let frequencyData = null; // 频率数据用于更丰富的视觉效果
+      let stars = []; // 背景星空
+      let backgroundSnowflakes = []; // 背景浮动小雪花
+      let lastRms = 0;
+      let lastCentroid = 0;
+      let lastZcr = 0;
+      let critiqueCooldown = 0;
+      const savedStyles = [];
+      let stormMode = false;
+      let rainDrops = [];
+      let lightning = 0;
+      let camStream = null;
+      let camOn = false;
+      let handStrength = 0;
+      let handStrengthSmooth = 0;
+      let handOpen = false;
+      let handCx = 0.5; // 0..1 in camera fx space
+      let handCy = 0.6; // 0..1 in camera fx space
+      const camCanvas = document.createElement('canvas');
+      const camCtx = camCanvas.getContext('2d', { willReadFrequently: true });
+      let prevHand = null;
+      const camFxCanvas = document.createElement('canvas');
+      const camFxCtx = camFxCanvas.getContext('2d', { willReadFrequently: true });
+      let camFxW = 0;
+      let camFxH = 0;
+      let camFxCooldown = 0;
+
+      // 绘制大雪花外轮廓边缘闪光效果
+      function drawSnowflakeOutlineGlow(ctx, centerX, centerY, radius, formation, smoothVolume, time) {
+        const arms = 6;
+        const glowRadius = radius * 1.08; // 稍微超出轮廓
+        const sparkleIntensity = 0.7 + Math.sin(time * 4) * 0.3; // 闪烁效果，更快
+        const glowAlpha = formation * smoothVolume * sparkleIntensity * 0.5;
+        
+        if (glowAlpha < 0.08) return;
+        
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        
+        // 绘制六条主枝的闪光
+        for (let a = 0; a < arms; a++) {
+          const angle = (a / arms) * Math.PI * 2;
+          const endX = Math.cos(angle) * glowRadius;
+          const endY = Math.sin(angle) * glowRadius;
+          
+          // 主枝闪光（更亮）
+          const mainGradient = ctx.createLinearGradient(0, 0, endX, endY);
+          mainGradient.addColorStop(0, `rgba(220, 240, 255, ${glowAlpha * 0.9})`);
+          mainGradient.addColorStop(0.3, `rgba(200, 230, 255, ${glowAlpha * 0.8})`);
+          mainGradient.addColorStop(0.6, `rgba(180, 220, 255, ${glowAlpha * 0.6})`);
+          mainGradient.addColorStop(0.85, `rgba(160, 210, 255, ${glowAlpha * 0.4})`);
+          mainGradient.addColorStop(1, 'transparent');
+          
+          ctx.strokeStyle = mainGradient;
+          ctx.lineWidth = 2.5 + sparkleIntensity * 2;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+          
+          // 侧枝闪光
+          for (const side of [-1, 1]) {
+            const branchAngle = angle + side * (Math.PI / 5.5);
+            const branchPos = 0.55;
+            const branchStartX = endX * branchPos;
+            const branchStartY = endY * branchPos;
+            const branchEndX = Math.cos(branchAngle) * glowRadius * 0.7 + branchStartX;
+            const branchEndY = Math.sin(branchAngle) * glowRadius * 0.7 + branchStartY;
+            
+            const branchGradient = ctx.createLinearGradient(branchStartX, branchStartY, branchEndX, branchEndY);
+            branchGradient.addColorStop(0, `rgba(210, 235, 255, ${glowAlpha * 0.7})`);
+            branchGradient.addColorStop(0.5, `rgba(190, 225, 255, ${glowAlpha * 0.5})`);
+            branchGradient.addColorStop(0.8, `rgba(170, 215, 255, ${glowAlpha * 0.3})`);
+            branchGradient.addColorStop(1, 'transparent');
+            
+            ctx.strokeStyle = branchGradient;
+            ctx.lineWidth = 2 + sparkleIntensity * 1.2;
+            ctx.beginPath();
+            ctx.moveTo(branchStartX, branchStartY);
+            ctx.lineTo(branchEndX, branchEndY);
+            ctx.stroke();
+          }
+          
+          // 端点闪光点（更亮更大）
+          const sparkleSize = 4 + sparkleIntensity * 3;
+          const sparkleGradient = ctx.createRadialGradient(endX, endY, 0, endX, endY, sparkleSize);
+          sparkleGradient.addColorStop(0, `rgba(240, 250, 255, ${glowAlpha})`);
+          sparkleGradient.addColorStop(0.3, `rgba(220, 240, 255, ${glowAlpha * 0.8})`);
+          sparkleGradient.addColorStop(0.6, `rgba(200, 230, 255, ${glowAlpha * 0.5})`);
+          sparkleGradient.addColorStop(1, 'transparent');
+          ctx.fillStyle = sparkleGradient;
+          ctx.beginPath();
+          ctx.arc(endX, endY, sparkleSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        ctx.restore();
+      }
+
+      // 绘制雪花骨架（用于连接线）
+      function drawSnowflakeSkeleton(ctx, x1, y1, x2, y2, size, hue, saturation, alpha) {
+        ctx.save();
+        
+        // 计算中点
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        
+        ctx.translate(midX, midY);
+        ctx.rotate(angle);
+        
+        const arms = 6;
+        // 骨架大小基于连接距离，但不要太大
+        const baseSize = Math.min(size * 0.5, length * 0.15);
+        const branchSize = baseSize * 0.35;
+        
+        ctx.strokeStyle = `hsla(${hue}, ${saturation}%, 88%, ${alpha})`;
+        ctx.lineWidth = Math.max(0.5, size * 0.08);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        
+        // 绘制六条主枝
+        for (let a = 0; a < arms; a++) {
+          const armAngle = (a / arms) * Math.PI * 2;
+          const endX = Math.cos(armAngle) * baseSize;
+          const endY = Math.sin(armAngle) * baseSize;
+          
+          // 主枝
+          ctx.moveTo(0, 0);
+          ctx.lineTo(endX, endY);
+          
+          // 侧枝
+          for (const side of [-1, 1]) {
+            const branchAngle = armAngle + side * (Math.PI / 5.5);
+            const branchPos = 0.55;
+            const branchStartX = endX * branchPos;
+            const branchStartY = endY * branchPos;
+            const branchEndX = Math.cos(branchAngle) * branchSize + branchStartX;
+            const branchEndY = Math.sin(branchAngle) * branchSize + branchStartY;
+            
+            ctx.moveTo(branchStartX, branchStartY);
+            ctx.lineTo(branchEndX, branchEndY);
+          }
+        }
+        
+        ctx.stroke();
+        
+        // 中心点
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, 90%, ${alpha * 0.8})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, baseSize * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+
+      // 绘制单个小雪花（更美观的版本）
+      function drawSmallSnowflake(ctx, x, y, size, rotation, hue, saturation, alpha, detail) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        
+        const arms = 6;
+        const baseSize = size;
+        const branchSize = baseSize * 0.35;
+        const lineWidth = Math.max(0.5, size * 0.08); // 更细腻的线条
+        
+        // 主枝颜色（细腻）
+        ctx.strokeStyle = `hsla(${hue}, ${saturation}%, 88%, ${alpha})`;
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, 91%, ${alpha * 0.85})`;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        
+        // 绘制六条主枝
+        for (let a = 0; a < arms; a++) {
+          const angle = (a / arms) * Math.PI * 2;
+          const endX = Math.cos(angle) * baseSize;
+          const endY = Math.sin(angle) * baseSize;
+          
+          // 主枝
+          ctx.moveTo(0, 0);
+          ctx.lineTo(endX, endY);
+          
+          // 侧枝（根据detail级别）
+          if (detail >= 1) {
+            for (const side of [-1, 1]) {
+              const branchAngle = angle + side * (Math.PI / 5.5);
+              const branchPos = 0.55; // 侧枝位置
+              const branchStartX = endX * branchPos;
+              const branchStartY = endY * branchPos;
+              const branchEndX = Math.cos(branchAngle) * branchSize + branchStartX;
+              const branchEndY = Math.sin(branchAngle) * branchSize + branchStartY;
+              
+              ctx.moveTo(branchStartX, branchStartY);
+              ctx.lineTo(branchEndX, branchEndY);
+              
+              // 更小的侧枝（高detail）
+              if (detail >= 2) {
+                const smallBranchSize = branchSize * 0.55;
+                const smallBranchAngle = branchAngle + side * (Math.PI / 10);
+                const smallBranchPos = 0.65;
+                const smallBranchStartX = branchEndX * smallBranchPos;
+                const smallBranchStartY = branchEndY * smallBranchPos;
+                const smallBranchEndX = Math.cos(smallBranchAngle) * smallBranchSize + smallBranchStartX;
+                const smallBranchEndY = Math.sin(smallBranchAngle) * smallBranchSize + smallBranchStartY;
+                
+                ctx.moveTo(smallBranchStartX, smallBranchStartY);
+                ctx.lineTo(smallBranchEndX, smallBranchEndY);
+                
+                // 第三层微细侧枝（最高detail）
+                if (detail >= 3) {
+                  const tinyBranchSize = smallBranchSize * 0.5;
+                  const tinyBranchAngle = smallBranchAngle + side * (Math.PI / 15);
+                  const tinyBranchEndX = Math.cos(tinyBranchAngle) * tinyBranchSize + smallBranchEndX * 0.8;
+                  const tinyBranchEndY = Math.sin(tinyBranchAngle) * tinyBranchSize + smallBranchEndY * 0.8;
+                  
+                  ctx.moveTo(smallBranchEndX * 0.8, smallBranchEndY * 0.8);
+                  ctx.lineTo(tinyBranchEndX, tinyBranchEndY);
+                }
+              }
+            }
+          }
+        }
+        
+        ctx.stroke();
+        
+        // 中心点（带光晕，更细腻）
+        const centerSize = size * 0.08; // 更小的中心点
+        const centerGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, centerSize * 2);
+        centerGradient.addColorStop(0, `hsla(${hue}, ${saturation}%, 90%, ${alpha * 0.9})`);
+        centerGradient.addColorStop(0.4, `hsla(${hue}, ${saturation}%, 88%, ${alpha * 0.7})`);
+        centerGradient.addColorStop(0.7, `hsla(${hue}, ${saturation}%, 86%, ${alpha * 0.4})`);
+        centerGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = centerGradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, centerSize * 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 中心核心点（更小）
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, 89%, ${alpha * 0.85})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, centerSize, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+
+      // 生成雪花轮廓点（六轴对称 + 多级分支，更密集的点分布）
+      function generateSnowflakePoints() {
+        const points = [];
+        const arms = 6;
+        const scale = Math.min(width, height) * 0.38;
+
+        for (let a = 0; a < arms; a++) {
+          const baseAngle = (a / arms) * Math.PI * 2;
+          // 主枝（从中心向外，更密集的点）
+          for (let r = 0.05; r <= 1; r += 0.05) {
+            points.push({
+              x: centerX + Math.cos(baseAngle) * r * scale,
+              y: centerY + Math.sin(baseAngle) * r * scale,
+            });
+          }
+          // 第一层侧枝（左右各一，更密集）
+          for (const side of [-1, 1]) {
+            const branchAngle = baseAngle + side * (Math.PI / 5);
+            for (let r = 0.2; r <= 0.8; r += 0.08) {
+              points.push({
+                x: centerX + Math.cos(branchAngle) * r * scale * 0.7,
+                y: centerY + Math.sin(branchAngle) * r * scale * 0.7,
+              });
+            }
+          }
+          // 第二层更小侧枝（更密集）
+          for (const side of [-1, 1]) {
+            const branchAngle = baseAngle + side * (Math.PI / 3.2);
+            for (let r = 0.35; r <= 0.7; r += 0.08) {
+              points.push({
+                x: centerX + Math.cos(branchAngle) * r * scale * 0.45,
+                y: centerY + Math.sin(branchAngle) * r * scale * 0.45,
+              });
+            }
+          }
+          // 第三层微细侧枝（新增）
+          for (const side of [-1, 1]) {
+            const branchAngle = baseAngle + side * (Math.PI / 2.8);
+            for (let r = 0.5; r <= 0.75; r += 0.1) {
+              points.push({
+                x: centerX + Math.cos(branchAngle) * r * scale * 0.3,
+                y: centerY + Math.sin(branchAngle) * r * scale * 0.3,
+              });
+            }
+          }
+        }
+        // 中心多点，让中心更实更密集
+        for (let i = 0; i < 20; i++) {
+          const angle = (i / 20) * Math.PI * 2;
+          const r = (Math.random() * 0.4 + 0.15) * 25;
+          points.push({
+            x: centerX + Math.cos(angle) * r,
+            y: centerY + Math.sin(angle) * r,
+          });
+        }
+        // 中心核心点
+        for (let i = 0; i < 8; i++) {
+          points.push({ x: centerX, y: centerY });
+        }
+        return points;
+      }
+
+      function initStars() {
+        stars = [];
+        const starCount = Math.floor((width * height) / 15000);
+        for (let i = 0; i < starCount; i++) {
+          stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 1.5,
+            brightness: 0.3 + Math.random() * 0.7,
+            twinkle: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      function initBackgroundSnowflakes() {
+        backgroundSnowflakes = [];
+        // 根据屏幕大小计算背景雪花数量，布满整个画面
+        const snowflakeCount = Math.floor((width * height) / 8000); // 密集分布
+        for (let i = 0; i < snowflakeCount; i++) {
+          backgroundSnowflakes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: 0.3 + Math.random() * 0.6, // 很小的雪花
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.02, // 缓慢旋转
+            floatX: (Math.random() - 0.5) * 0.3, // 水平浮动速度
+            floatY: 0.1 + Math.random() * 0.2, // 垂直下落速度
+            alpha: 0.15 + Math.random() * 0.2, // 很淡
+            hue: 180 + Math.random() * 40, // 青蓝色系
+            saturation: 40 + Math.random() * 20,
+            detail: Math.floor(Math.random() * 2), // 简单细节
+            phase: Math.random() * Math.PI * 2, // 浮动相位
+          });
+        }
+      }
+
+      function initRain() {
+        rainDrops = [];
+        const count = Math.floor((width * height) / 12000);
+        for (let i = 0; i < count; i++) {
+          rainDrops.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            l: 10 + Math.random() * 26,
+            s: 5 + Math.random() * 10,
+            a: 0.15 + Math.random() * 0.25,
+          });
+        }
+      }
+
+      function resize() {
+        const rect = stage.getBoundingClientRect();
+        width = canvas.width = Math.max(1, Math.floor(rect.width));
+        height = canvas.height = Math.max(1, Math.floor(rect.height));
+        centerX = width / 2;
+        centerY = height / 2;
+        snowflakePoints = generateSnowflakePoints();
+        initStars();
+        initBackgroundSnowflakes();
+        initRain();
+        if (particles.length === 0) {
+          initParticles();
+        } else {
+          // 更新已有粒子的目标索引
+          for (let i = 0; i < particles.length; i++) {
+            particles[i].targetIndex = i % snowflakePoints.length;
+          }
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        const initRadius = Math.min(width, height) * 0.45; // 更小的初始半径，更密集
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          // 使用更密集的分布模式
+          const radius = Math.pow(Math.random(), 0.7) * initRadius; // 平方根分布，中心更密集
+          const particleType = Math.random(); // 粒子类型
+          
+          particles.push({
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            targetIndex: i % (snowflakePoints.length || 1),
+            // 小雪花的基础大小（更细腻）
+            size: 0.4 + Math.random() * 0.9, // 减小基础大小，更细腻
+            baseHue: 170 + Math.random() * 70, // 更丰富的色相范围
+            hue: 170 + Math.random() * 70,
+            alpha: 0.3 + Math.random() * 0.5, // 稍微降低透明度
+            baseAlpha: 0.3 + Math.random() * 0.5, // 稍微降低透明度
+            saturation: 55 + Math.random() * 30, // 饱和度变化
+            pulse: Math.random() * Math.PI * 2, // 脉冲相位
+            pulseSpeed: 0.04 + Math.random() * 0.12, // 不同的脉冲速度
+            speed: 0.4 + Math.random() * 1.6, // 个体速度系数
+            trail: [], // 轨迹点
+            maxTrailLength: 3 + Math.floor(Math.random() * 5), // 适中的轨迹长度
+            glowIntensity: 0.6 + Math.random() * 0.4, // 光晕强度变化
+            type: particleType < 0.3 ? 'small' : particleType < 0.7 ? 'medium' : 'large', // 粒子类型
+            rotation: Math.random() * Math.PI * 2, // 旋转角度
+            rotationSpeed: (Math.random() - 0.5) * 0.03, // 旋转速度
+            sparkle: Math.random() * Math.PI * 2, // 闪烁相位
+            sparkleSpeed: 0.1 + Math.random() * 0.2, // 闪烁速度
+            snowflakeDetail: Math.floor(Math.random() * 3), // 雪花细节级别 0-2
+          });
+        }
+      }
+
+      async function startAudio() {
+        try {
+          if (started) return;
+          stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+              echoCancellation: false,
+              noiseSuppression: false,
+              autoGainControl: false
+            } 
+          });
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 512; // 增加FFT大小以获得更精细的频率分析
+          analyser.smoothingTimeConstant = 0.3; // 降低平滑度，提高响应速度
+          analyser.minDecibels = -90; // 降低最小分贝，捕捉更细微的声音
+          analyser.maxDecibels = -10;
+          const source = audioContext.createMediaStreamSource(stream);
+          source.connect(analyser);
+          statusEl.textContent = '对着麦克风发出声音，小雪花会聚集成大雪花';
+          statusEl.classList.add('ready');
+          btnStart.classList.add('hidden');
+          started = true;
+        } catch (e) {
+          statusEl.textContent = '无法使用麦克风：请允许权限，并用 localhost 或 HTTPS 打开';
+          console.error(e);
+        }
+      }
+
+      function getVolume() {
+        if (!analyser) return 0;
+        
+        // 获取频率数据
+        const freqData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(freqData);
+        frequencyData = freqData;
+        
+        // 获取时域数据（更敏感）
+        const timeData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteTimeDomainData(timeData);
+        
+        // 计算RMS（均方根）音量，对细微声音更敏感
+        let sumSquares = 0;
+        let zcrCount = 0;
+        let prev = (timeData[0] - 128) / 128;
+        for (let i = 0; i < timeData.length; i++) {
+          const normalized = (timeData[i] - 128) / 128;
+          sumSquares += normalized * normalized;
+          if (i > 0) {
+            if ((normalized >= 0 && prev < 0) || (normalized < 0 && prev >= 0)) zcrCount++;
+            prev = normalized;
+          }
+        }
+        const rms = Math.sqrt(sumSquares / timeData.length);
+        const zcr = zcrCount / timeData.length;
+        
+        // 计算频率数据的加权平均（中高频权重更高，人声更敏感）
+        let weightedSum = 0;
+        let weightSum = 0;
+        let centroidNum = 0;
+        let centroidDen = 0;
+        for (let i = 0; i < freqData.length; i++) {
+          const weight = 1 + (i / freqData.length) * 2; // 高频权重更高
+          weightedSum += freqData[i] * weight;
+          weightSum += weight;
+          centroidNum += i * freqData[i];
+          centroidDen += freqData[i];
+        }
+        const freqVolume = weightedSum / weightSum / 255;
+        const centroid = centroidDen > 0 ? (centroidNum / centroidDen) / freqData.length : 0;
+        
+        // 结合RMS和频率数据，并应用增益放大
+        const combinedVolume = Math.max(rms * 1.8, freqVolume * 1.5); // 增益放大
+        lastRms = rms;
+        lastCentroid = centroid;
+        lastZcr = zcr;
+        return Math.min(1, combinedVolume * 1.2); // 轻微压缩，让低音量也能有反应
+      }
+
+      function drawMiniMeter() {
+        const w = miniMeter.width;
+        const h = miniMeter.height;
+        meterCtx.clearRect(0, 0, w, h);
+        meterCtx.fillStyle = 'rgba(0,0,0,0.15)';
+        meterCtx.fillRect(0, 0, w, h);
+
+        // 音量条
+        const v = Math.min(1, Math.max(0, smoothVolume));
+        const db = v * 300; // 0..300
+        const barW = Math.floor(w * v);
+        const grad = meterCtx.createLinearGradient(0, 0, w, 0);
+        // 颜色随分贝升高而变“热”
+        const hot = Math.max(0, Math.min(1, (db - 190) / 90)); // 190..280
+        grad.addColorStop(0, `rgba(${Math.round(126 + hot * 90)}, ${Math.round(184 - hot * 40)}, ${Math.round(218 - hot * 120)}, 0.65)`);
+        grad.addColorStop(0.6, `rgba(${Math.round(184 + hot * 55)}, ${Math.round(212 - hot * 80)}, ${Math.round(232 - hot * 140)}, 0.75)`);
+        grad.addColorStop(1, `rgba(${Math.round(255)}, ${Math.round(255 - hot * 160)}, ${Math.round(255 - hot * 160)}, 0.65)`);
+        meterCtx.fillStyle = grad;
+        // 大条更醒目
+        meterCtx.fillRect(0, h - 24, barW, 16);
+
+        // 峰值保持线（简单 peak-hold）
+        drawMiniMeter.peak = Math.max(v, (drawMiniMeter.peak || 0) * 0.96);
+        const peakX = Math.floor(w * drawMiniMeter.peak);
+        meterCtx.fillStyle = `rgba(255, 255, 255, ${0.45 + hot * 0.35})`;
+        meterCtx.fillRect(Math.max(0, peakX - 1), h - 28, 2, 24);
+
+        // 频谱（上半部分）
+        if (frequencyData) {
+          const bins = frequencyData.length;
+          const step = Math.max(1, Math.floor(bins / 80));
+          const maxH = h - 28;
+          meterCtx.strokeStyle = `rgba(200,220,255,${0.35 + v * 0.35})`;
+          meterCtx.lineWidth = 1.25;
+          meterCtx.beginPath();
+          let x = 0;
+          for (let i = 0; i < bins; i += step) {
+            const val = frequencyData[i] / 255;
+            const y = maxH - val * (maxH - 6);
+            if (x === 0) meterCtx.moveTo(x, y);
+            else meterCtx.lineTo(x, y);
+            x += w / (bins / step);
+          }
+          meterCtx.stroke();
+
+          // 频谱填充（更明显）
+          meterCtx.lineTo(w, maxH);
+          meterCtx.lineTo(0, maxH);
+          meterCtx.closePath();
+          meterCtx.fillStyle = `rgba(126,184,218,${0.08 + v * 0.12})`;
+          meterCtx.fill();
+        }
+
+        loudnessPill.textContent = `${Math.round(v * 100)}%`;
+        dbPill.textContent = `${db.toFixed(1)} dB`;
+
+        // 面板热区提示
+        const panelAudio = document.getElementById('panelAudio');
+        if (panelAudio) {
+          if (db >= 220) panelAudio.classList.add('hot');
+          else panelAudio.classList.remove('hot');
+        }
+      }
+
+      function updateCritique() {
+        // 用 centroid（明亮度）、zcr（嘶噪/尖锐感）、rms（响度）给出“批评”
+        const v = smoothVolume;
+        const centroid = lastCentroid;
+        const zcr = lastZcr;
+
+        // 清晰度：明亮且不过分尖锐时更清晰
+        const clarityScore = Math.max(0, Math.min(1, centroid * 1.2 - zcr * 0.9));
+        clarityPill.textContent = `${Math.round(clarityScore * 100)}%`;
+
+        if (critiqueCooldown > 0) {
+          critiqueCooldown--;
+          return;
+        }
+
+        if (v < 0.03) {
+          critiqueText.textContent = '等待声音…';
+          critiqueCooldown = 12;
+          return;
+        }
+
+        // emoji 规则：按“当前分贝”区间直接映射
+        // 5-15 ❤️，15-30 🙂，30-60 🌸，60-90 👏，90-120 🎤，120-190 💃，190-220 ❗，220-280 😡
+        //（<5 视为安静；>280 视为噪音）
+        const currentDb = smoothVolume * 300;
+        if (currentDb < 5) critiqueText.textContent = '…';
+        else if (currentDb < 15) critiqueText.textContent = '❤️';
+        else if (currentDb < 30) critiqueText.textContent = '🙂';
+        else if (currentDb < 60) critiqueText.textContent = '🌸';
+        else if (currentDb < 90) critiqueText.textContent = '👏';
+        else if (currentDb < 120) critiqueText.textContent = '🎤';
+        else if (currentDb < 190) critiqueText.textContent = '💃';
+        else if (currentDb < 220) critiqueText.textContent = '❗';
+        else if (currentDb <= 280) critiqueText.textContent = '😡';
+        else critiqueText.textContent = '😡';
+        critiqueCooldown = 18;
+      }
+
+      function renderSavedList() {
+        savedList.innerHTML = '';
+        for (let i = savedStyles.length - 1; i >= 0; i--) {
+          const s = savedStyles[i];
+          const wrap = document.createElement('div');
+          const c = document.createElement('canvas');
+          c.className = 'thumb';
+          c.width = 280;
+          c.height = 140;
+          const cctx = c.getContext('2d');
+          cctx.fillStyle = 'rgba(5, 8, 16, 1)';
+          cctx.fillRect(0, 0, c.width, c.height);
+
+          // 画一个缩略版大雪花：骨架 + 外轮廓闪光（静态）
+          const cx = c.width / 2;
+          const cy = c.height / 2;
+          const r = Math.min(c.width, c.height) * 0.32;
+          // 骨架
+          for (let a = 0; a < 6; a++) {
+            const ang = (a / 6) * Math.PI * 2;
+            const ex = cx + Math.cos(ang) * r;
+            const ey = cy + Math.sin(ang) * r;
+            drawSnowflakeSkeleton(cctx, cx, cy, ex, ey, r * 0.8, s.hue, s.sat, 0.45);
+          }
+          // 外轮廓发光（用保存时刻的强度）
+          drawSnowflakeOutlineGlow(cctx, cx, cy, r, s.formation, s.volume, s.time);
+
+          const meta = document.createElement('div');
+          meta.className = 'thumb-meta';
+          meta.innerHTML = `<span>${new Date(s.ts).toLocaleTimeString()}</span><span>${Math.round(s.volume * 100)}%</span>`;
+
+          c.addEventListener('click', () => {
+            // 导出缩略图 PNG
+            const a = document.createElement('a');
+            a.download = `snowflake-style-${s.ts}.png`;
+            a.href = c.toDataURL('image/png');
+            a.click();
+          });
+
+          wrap.appendChild(c);
+          wrap.appendChild(meta);
+          savedList.appendChild(wrap);
+        }
+      }
+
+      btnSave.addEventListener('click', () => {
+        savedStyles.push({
+          ts: Date.now(),
+          hue: 200,
+          sat: 55,
+          formation: formation,
+          volume: smoothVolume,
+          time: time,
+        });
+        if (savedStyles.length > 10) savedStyles.shift();
+        renderSavedList();
+      });
+
+      async function startCamera() {
+        try {
+          camStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'user',
+              width: { ideal: 640 },
+              height: { ideal: 480 }
+            },
+            audio: false
+          });
+          camVideo.srcObject = camStream;
+          camOn = true;
+          btnCam.textContent = '关闭摄像头';
+          handPill.textContent = '等待手势…';
+        } catch (e) {
+          camOn = false;
+          handPill.textContent = '权限失败';
+          console.error(e);
+        }
+      }
+
+      function stopCamera() {
+        if (camStream) {
+          for (const t of camStream.getTracks()) t.stop();
+        }
+        camStream = null;
+        camOn = false;
+        btnCam.textContent = '开启摄像头';
+        handPill.textContent = '—';
+        prevHand = null;
+        camFxDrawCtx.clearRect(0, 0, camFx.width, camFx.height);
+      }
+
+      btnCam.addEventListener('click', () => {
+        if (camOn) stopCamera();
+        else startCamera();
+      });
+
+      function updateHandGesture() {
+        if (!camOn) return;
+        if (!camVideo.videoWidth || !camVideo.videoHeight) return;
+
+        // 降采样尺寸：性能关键
+        const desiredW = 160;
+        const desiredH = 120;
+        if (camFxW !== desiredW || camFxH !== desiredH) {
+          camFxW = desiredW;
+          camFxH = desiredH;
+          camFxCanvas.width = camFxW;
+          camFxCanvas.height = camFxH;
+        }
+
+        // 镜像绘制
+        camFxCtx.save();
+        camFxCtx.clearRect(0, 0, camFxW, camFxH);
+        camFxCtx.translate(camFxW, 0);
+        camFxCtx.scale(-1, 1);
+        camFxCtx.drawImage(camVideo, 0, 0, camFxW, camFxH);
+        camFxCtx.restore();
+
+        const img = camFxCtx.getImageData(0, 0, camFxW, camFxH).data;
+        // 简易“肤色 + 运动”启发式：估计手部占比与中心点
+        let count = 0;
+        let sumX = 0;
+        let sumY = 0;
+        let motion = 0;
+        const gray = new Uint8Array(camFxW * camFxH);
+
+        for (let y = 0; y < camFxH; y++) {
+          for (let x = 0; x < camFxW; x++) {
+            const idx = (y * camFxW + x) * 4;
+            const r = img[idx], g = img[idx + 1], b = img[idx + 2];
+            const p = y * camFxW + x;
+            const lum = (r * 0.299 + g * 0.587 + b * 0.114) | 0;
+            gray[p] = lum;
+
+            // YCbCr-ish skin rule (rough)
+            const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+            const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+            const skin = cr > 140 && cr < 185 && cb > 90 && cb < 135 && r > 60;
+
+            if (skin) {
+              count++;
+              sumX += x;
+              sumY += y;
+            }
+          }
+        }
+
+        if (prevHand) {
+          // 运动量：平均帧差
+          let diffSum = 0;
+          for (let i = 0; i < gray.length; i++) diffSum += Math.abs(gray[i] - prevHand[i]);
+          motion = diffSum / gray.length; // 0-255
+        }
+        prevHand = gray;
+
+        const areaFrac = count / (camFxW * camFxH);
+        const cx = count > 0 ? sumX / count : camFxW * 0.5;
+        const cy = count > 0 ? sumY / count : camFxH * 0.6;
+        handCx += ((cx / camFxW) - handCx) * 0.25;
+        handCy += ((cy / camFxH) - handCy) * 0.25;
+
+        // “张开”近似：手面积更大 + 运动更明显
+        const motionN = Math.min(1, Math.max(0, (motion - 4) / 18));
+        const rawStrength = Math.min(1, Math.max(0, areaFrac * 6 + motionN * 0.8));
+        handStrength += (rawStrength - handStrength) * 0.35;
+        handStrengthSmooth += (handStrength - handStrengthSmooth) * 0.2;
+
+        handOpen = areaFrac > 0.08 || (areaFrac > 0.05 && motionN > 0.35);
+        handPill.textContent = handOpen ? `张开 ${Math.round(handStrengthSmooth * 100)}%` : `未检测 ${Math.round(handStrengthSmooth * 100)}%`;
+      }
+
+      function drawHandDbSegments(currentDb) {
+        if (!camOn) return;
+
+        // 覆盖层 canvas 尺寸（跟随 cam-wrap）
+        const rect = camVideo.getBoundingClientRect();
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const targetW = Math.max(1, Math.floor(rect.width * dpr));
+        const targetH = Math.max(1, Math.floor(rect.height * dpr));
+        if (camFx.width !== targetW || camFx.height !== targetH) {
+          camFx.width = targetW;
+          camFx.height = targetH;
+        }
+
+        camFxDrawCtx.clearRect(0, 0, camFx.width, camFx.height);
+
+        const cx = handCx * camFx.width;
+        const cy = handCy * camFx.height;
+        const dbN = Math.max(0, Math.min(1, currentDb / 300));
+        const interact = handOpen ? (0.25 + handStrengthSmooth * 0.75) : 0.12;
+        const baseLen = (0.22 + dbN * 0.65) * Math.min(camFx.width, camFx.height);
+        const len = baseLen * (0.55 + interact);
+        const segments = 18;
+
+        // 背后淡光晕
+        const glow = camFxDrawCtx.createRadialGradient(cx, cy, 0, cx, cy, len * 0.55);
+        glow.addColorStop(0, `rgba(160, 210, 255, ${0.12 * interact})`);
+        glow.addColorStop(1, 'transparent');
+        camFxDrawCtx.fillStyle = glow;
+        camFxDrawCtx.beginPath();
+        camFxDrawCtx.arc(cx, cy, len * 0.55, 0, Math.PI * 2);
+        camFxDrawCtx.fill();
+
+        for (let i = 0; i < segments; i++) {
+          const a = (i / segments) * Math.PI * 2 + Math.sin(time * 0.9 + i) * 0.06 * interact;
+          const wobble = 0.9 + Math.sin(time * 2.2 + i * 1.7) * 0.12 * interact;
+          const l = len * wobble * (0.55 + Math.sin(i * 2.0) * 0.08);
+          const x2 = cx + Math.cos(a) * l;
+          const y2 = cy + Math.sin(a) * l;
+
+          const alpha = 0.22 + dbN * 0.35 + interact * 0.18;
+          camFxDrawCtx.strokeStyle = `rgba(200, 230, 255, ${alpha})`;
+          camFxDrawCtx.lineWidth = (handOpen ? 2.2 : 1.3) * dpr;
+          camFxDrawCtx.lineCap = 'round';
+          camFxDrawCtx.beginPath();
+          camFxDrawCtx.moveTo(cx, cy);
+          camFxDrawCtx.lineTo(x2, y2);
+          camFxDrawCtx.stroke();
+
+          // 端点亮点
+          const r = (handOpen ? 3.5 : 2.2) * dpr;
+          const g = camFxDrawCtx.createRadialGradient(x2, y2, 0, x2, y2, r * 2.2);
+          g.addColorStop(0, `rgba(240, 250, 255, ${alpha * 0.8})`);
+          g.addColorStop(1, 'transparent');
+          camFxDrawCtx.fillStyle = g;
+          camFxDrawCtx.beginPath();
+          camFxDrawCtx.arc(x2, y2, r * 2.2, 0, Math.PI * 2);
+          camFxDrawCtx.fill();
+        }
+      }
+
+      btnStart.addEventListener('click', startAudio);
+      btnStart.addEventListener('pointerdown', startAudio, { passive: true });
+
+      function animate() {
+        time += 0.016; // 约60fps的时间增量
+
+        if (!started) {
+          // 未开始时的背景动画
+          ctx.fillStyle = 'rgba(5, 8, 16, 0.3)';
+          ctx.fillRect(0, 0, width, height);
+          animationId = requestAnimationFrame(animate);
+          return;
+        }
+
+        smoothVolume += (volume - smoothVolume) * 0.25; // 提高响应速度
+        volume = getVolume();
+
+        // 当前“艺术化分贝”
+        const currentDb = smoothVolume * 300;
+        // 275 dB：雪花盛放到最明显；>=280 dB：狂风暴雨
+        const bloomPeak = currentDb >= 275 && currentDb < 280;
+        const bloom = bloomPeak ? 1 : Math.max(0, Math.min(1, (currentDb - 235) / 40)); // 235→275 逐渐盛放
+        stormMode = !bloomPeak && currentDb >= 280;
+
+        // 暴雨模式的闪电
+        if (stormMode) {
+          if (Math.random() < 0.02) lightning = 1;
+          lightning *= 0.85;
+        } else {
+          lightning *= 0.9;
+        }
+
+        // 音量越大，formation 越接近 1，粒子越聚成雪花；更敏感的反应
+        const targetFormationBase = Math.min(1, smoothVolume * 3.2);
+        const targetFormation = stormMode ? 0.08 : (bloomPeak ? 1 : Math.min(1, targetFormationBase + bloom * 0.55));
+        const formationSpeed = stormMode ? 0.18 : (bloomPeak ? 0.22 : ((smoothVolume > 0.2 ? 0.08 : 0.03) + bloom * 0.07));
+        formation += (targetFormation - formation) * formationSpeed;
+
+        // 更敏感的粒子激活，低音量也能看到更多粒子，更密集
+        const activeCount = Math.floor(PARTICLE_COUNT * (0.4 + smoothVolume * 0.6));
+        const baseSpeed = (stormMode ? 0.9 : 0.25) + smoothVolume * (stormMode ? 3.4 : 2.3) + bloom * 0.7 + (bloomPeak ? 0.35 : 0);
+        const jitter = (stormMode ? 0.8 : 0.12) + (1 - formation) * (stormMode ? 2.2 : (bloomPeak ? 0.45 : 0.9));
+
+        // 风（暴雨模式）
+        const windX = stormMode ? (-6 - smoothVolume * 18) : 0;
+        const windY = stormMode ? (2 + smoothVolume * 6) : 0;
+
+        // 根据音量动态调整背景淡出速度（更细腻的过渡）
+        const fadeAlpha = stormMode ? 0.22 : (0.1 + (1 - smoothVolume) * 0.1);
+        ctx.fillStyle = `rgba(5, 8, 16, ${fadeAlpha})`;
+        ctx.fillRect(0, 0, width, height);
+
+        // 暴雨与闪电（只在暴雨模式）
+        if (stormMode) {
+          // 闪电泛白
+          if (lightning > 0.05) {
+            ctx.fillStyle = `rgba(220, 240, 255, ${0.18 * lightning})`;
+            ctx.fillRect(0, 0, width, height);
+          }
+          // 雨线
+          ctx.lineCap = 'round';
+          for (const d of rainDrops) {
+            d.x += windX * 0.9 + d.s;
+            d.y += windY + d.s * 1.3;
+            if (d.x < -60) d.x = width + 60;
+            if (d.y > height + 60) {
+              d.y = -60;
+              d.x = Math.random() * width;
+            }
+            const x2 = d.x - windX * 0.6;
+            const y2 = d.y - d.l;
+            ctx.strokeStyle = `rgba(190, 220, 255, ${d.a})`;
+            ctx.lineWidth = 1.1;
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          }
+        }
+
+        // 绘制背景星空
+        for (const star of stars) {
+          star.twinkle += 0.02;
+          const twinkleBrightness = 0.5 + Math.sin(star.twinkle) * 0.5;
+          const starAlpha = stormMode ? 0.08 : 0.4;
+          ctx.fillStyle = `rgba(200, 220, 255, ${star.brightness * twinkleBrightness * starAlpha})`;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 更新和绘制背景浮动小雪花
+        for (let i = 0; i < backgroundSnowflakes.length; i++) {
+          const sf = backgroundSnowflakes[i];
+          
+          // 更新位置（浮动效果）
+          sf.phase += 0.01;
+          sf.x += sf.floatX * (0.5 + Math.sin(sf.phase) * 0.5) + windX * 0.12;
+          sf.y += sf.floatY + windY * 0.12;
+          sf.rotation += sf.rotationSpeed;
+          
+          // 边界循环
+          if (sf.x < -50) sf.x = width + 50;
+          if (sf.x > width + 50) sf.x = -50;
+          if (sf.y > height + 50) {
+            sf.y = -50;
+            sf.x = Math.random() * width;
+          }
+          
+          // 绘制背景小雪花（很淡，很细腻）
+          if (sf.y > -20 && sf.y < height + 20) {
+            drawSmallSnowflake(
+              ctx,
+              sf.x,
+              sf.y,
+              sf.size,
+              sf.rotation,
+              sf.hue,
+              sf.saturation,
+              stormMode ? sf.alpha * 0.6 : sf.alpha,
+              sf.detail
+            );
+          }
+        }
+
+        // 更新粒子
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const target = snowflakePoints[p.targetIndex];
+          const t = formation;
+          const dx = target.x - p.x;
+          const dy = target.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // 雪花吸引力
+          if (t > 0.01) {
+            const pull = (stormMode ? 0.006 : 0.02) + t * (stormMode ? 0.02 : (0.08 + bloom * 0.04));
+            p.vx += (dx / (dist + 1)) * pull;
+            p.vy += (dy / (dist + 1)) * pull;
+          }
+
+          // 随机扰动
+          p.vx += (Math.random() - 0.5) * jitter;
+          p.vy += (Math.random() - 0.5) * jitter;
+          // 风
+          p.vx += windX * 0.02;
+          p.vy += windY * 0.02;
+          p.vx *= 0.92;
+          p.vy *= 0.92;
+          p.x += p.vx * baseSpeed * p.speed;
+          p.y += p.vy * baseSpeed * p.speed;
+
+          // 边界反弹
+          if (p.x < 0 || p.x > width) p.vx *= -0.5;
+          if (p.y < 0 || p.y > height) p.vy *= -0.5;
+          p.x = Math.max(0, Math.min(width, p.x));
+          p.y = Math.max(0, Math.min(height, p.y));
+
+          // 更新轨迹
+          p.trail.push({ x: p.x, y: p.y, alpha: 1 });
+          if (p.trail.length > p.maxTrailLength) {
+            p.trail.shift();
+          }
+
+          // 根据频率数据调整色相（如果有）- 更细腻的颜色响应
+          if (frequencyData) {
+            const freqIndex = i % frequencyData.length;
+            const freqValue = frequencyData[freqIndex] / 255;
+            // 更细腻的色相变化，根据频率响应
+            p.hue = p.baseHue + freqValue * 50 - 25;
+            // 根据频率动态调整饱和度，让颜色更丰富
+            p.saturation = (p.saturation || 60) + freqValue * 25;
+            p.saturation = Math.max(40, Math.min(85, p.saturation)); // 限制范围
+          }
+
+          // 脉冲效果 - 使用个体速度
+          p.pulse += p.pulseSpeed;
+          
+          // 旋转效果
+          p.rotation += p.rotationSpeed;
+          
+          // 闪烁效果
+          p.sparkle += p.sparkleSpeed;
+        }
+
+        // 绘制雪花骨架连接线（小雪花聚集成大雪花时的骨架形态）
+        if (!stormMode && formation > 0.15) {
+          const maxConnections = Math.min(activeCount, 700);
+          // 连接距离随formation增大，形成大雪花时连接更远
+          const connectionDistance = 50 * (1 + formation * 1.5 + smoothVolume * 0.6);
+          
+          for (let i = 0; i < maxConnections; i += 1) {
+            const p1 = particles[i];
+            let connections = 0;
+            // 检查更多附近的雪花
+            for (let j = i + 1; j < Math.min(maxConnections, i + 35) && connections < 6; j++) {
+              const p2 = particles[j];
+              const dx = p1.x - p2.x;
+              const dy = p1.y - p2.y;
+              const distSq = dx * dx + dy * dy;
+              if (distSq < connectionDistance * connectionDistance) {
+                const dist = Math.sqrt(distSq);
+                const normalizedDist = dist / connectionDistance;
+                // formation越高，连接线越明显（增强）
+                const alpha = (1 - normalizedDist) * (0.3 + formation * 0.4) * (formation * 1.2);
+                const hue = (p1.hue + p2.hue) / 2;
+                const saturation = ((p1.saturation || 60) + (p2.saturation || 60)) / 2;
+                
+                // 绘制雪花骨架而不是直线
+                const skeletonSize = dist * 0.3 * (1 + formation * 0.5);
+                drawSnowflakeSkeleton(
+                  ctx,
+                  p1.x, p1.y,
+                  p2.x, p2.y,
+                  skeletonSize,
+                  hue,
+                  saturation,
+                  alpha
+                );
+                connections++;
+              }
+            }
+          }
+        }
+
+        // 绘制小雪花轨迹（仅在低formation时显示，形成大雪花时隐藏）
+        if (formation < 0.5) {
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            if (i >= activeCount || p.trail.length < 2 || p.type === 'small') continue;
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            for (let t = 0; t < p.trail.length - 1; t++) {
+              const point1 = p.trail[t];
+              const point2 = p.trail[t + 1];
+              const progress = t / (p.trail.length - 1);
+              const fadeAlpha = (1 - progress) * (0.2 + smoothVolume * 0.3) * (1 - formation);
+              const lineWidth = 0.6 + (1 - progress) * 0.4;
+              
+              ctx.lineWidth = lineWidth;
+              ctx.strokeStyle = `hsla(${p.hue}, ${p.saturation || 55}%, 78%, ${fadeAlpha * 0.3})`;
+              ctx.beginPath();
+              ctx.moveTo(point1.x, point1.y);
+              ctx.lineTo(point2.x, point2.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // 绘制小雪花粒子（根据音量聚集成大雪花）
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const visible = i < activeCount;
+          if (!visible) continue;
+
+          const pulseSize = 1 + Math.sin(p.pulse) * 0.08;
+          const sparkleEffect = 0.9 + Math.sin(p.sparkle) * 0.1; // 闪烁效果
+          // 根据粒子类型调整基础大小（更细腻）
+          const typeMultiplier = p.type === 'small' ? 0.55 : p.type === 'medium' ? 0.75 : 0.95;
+          // 小雪花的基础大小：低音量时更小(2-4px)，高音量时适中(6-12px)
+          const baseSize = p.size * typeMultiplier * pulseSize * (2.5 + smoothVolume * 5 + formation * 3.5);
+          const alpha = p.baseAlpha * (0.5 + smoothVolume * 0.3) * sparkleEffect; // 稍微降低透明度
+          const saturation = p.saturation || 60;
+
+          if (alpha > 0.02 && baseSize > 1) { // 调整阈值
+            // 根据formation值调整雪花大小和细节
+            // formation越高，雪花越大，细节越多（聚集成大雪花）
+            const snowflakeSize = baseSize * (1 + formation * 0.6); // 稍微减小formation时的放大倍数
+            // detail级别：0=简单，1=有侧枝，2=多级侧枝，3=最复杂
+            // formation越高，detail级别越高
+            const baseDetail = Math.floor(p.snowflakeDetail);
+            const formationDetail = Math.floor(formation * 2.5);
+            const detailLevel = Math.min(3, baseDetail + formationDetail);
+            
+            // 绘制小雪花
+            drawSmallSnowflake(
+              ctx,
+              p.x,
+              p.y,
+              snowflakeSize,
+              p.rotation,
+              p.hue,
+              saturation,
+              alpha,
+              detailLevel
+            );
+            
+            // 添加光晕效果（增强，形成大雪花时更明显）
+            if (smoothVolume > 0.15) {
+              // formation越高，光晕越大
+              const glowSize = snowflakeSize * (1.8 + formation * 0.5);
+              const glowAlpha = alpha * (0.25 + formation * 0.15) * (0.3 + smoothVolume * 0.6);
+              const glowGradient = ctx.createRadialGradient(
+                p.x, p.y, 0,
+                p.x, p.y, glowSize
+              );
+              glowGradient.addColorStop(0, `hsla(${p.hue}, ${saturation * 0.5}%, 85%, ${glowAlpha})`);
+              glowGradient.addColorStop(0.3, `hsla(${p.hue}, ${saturation * 0.4}%, 83%, ${glowAlpha * 0.7})`);
+              glowGradient.addColorStop(0.6, `hsla(${p.hue}, ${saturation * 0.3}%, 81%, ${glowAlpha * 0.4})`);
+              glowGradient.addColorStop(1, 'transparent');
+              ctx.fillStyle = glowGradient;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, glowSize, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+
+        // 高音量时的中心大光晕效果（增强，让大雪花形态更明显）
+        if (!stormMode && (smoothVolume > 0.22 || bloomPeak) && formation > 0.22) {
+          const centerGlowSize = (0.22 + smoothVolume) * Math.min(width, height) * 0.62 * (1 + formation * 0.65);
+          const glowIntensity = (0.25 + smoothVolume) * formation * (bloomPeak ? 1.8 : 1.2);
+          
+          // 外层大光晕（增强）
+          const outerGradient = ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, centerGlowSize
+          );
+          outerGradient.addColorStop(0, `rgba(160, 210, 255, ${0.18 * glowIntensity})`);
+          outerGradient.addColorStop(0.25, `rgba(150, 200, 250, ${0.12 * glowIntensity})`);
+          outerGradient.addColorStop(0.5, `rgba(140, 190, 245, ${0.08 * glowIntensity})`);
+          outerGradient.addColorStop(0.75, `rgba(120, 170, 230, ${0.04 * glowIntensity})`);
+          outerGradient.addColorStop(1, 'transparent');
+          ctx.fillStyle = outerGradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, centerGlowSize, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // 中层光晕（新增）
+          const midGradient = ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, centerGlowSize * 0.7
+          );
+          midGradient.addColorStop(0, `rgba(170, 215, 255, ${0.25 * glowIntensity})`);
+          midGradient.addColorStop(0.4, `rgba(160, 210, 255, ${0.15 * glowIntensity})`);
+          midGradient.addColorStop(0.7, `rgba(150, 200, 250, ${0.08 * glowIntensity})`);
+          midGradient.addColorStop(1, 'transparent');
+          ctx.fillStyle = midGradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, centerGlowSize * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // 内层光晕（增强）
+          const innerGradient = ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, centerGlowSize * 0.5
+          );
+          innerGradient.addColorStop(0, `rgba(180, 220, 255, ${0.3 * glowIntensity})`);
+          innerGradient.addColorStop(0.4, `rgba(170, 215, 255, ${0.2 * glowIntensity})`);
+          innerGradient.addColorStop(0.7, `rgba(160, 210, 255, ${0.12 * glowIntensity})`);
+          innerGradient.addColorStop(1, 'transparent');
+          ctx.fillStyle = innerGradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, centerGlowSize * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // 绘制大雪花外轮廓边缘闪光效果
+          const outlineRadius = centerGlowSize * (0.6 + bloom * 0.25); // 盛放时轮廓更外扩
+          drawSnowflakeOutlineGlow(ctx, centerX, centerY, outlineRadius, formation, smoothVolume, time);
+        }
+
+        drawMiniMeter();
+        updateCritique();
+        updateHandGesture();
+        // 用当前分贝驱动线段交互
+        drawHandDbSegments(smoothVolume * 300);
+        volumeFill.style.width = (smoothVolume * 100) + '%';
+        animationId = requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
+    })();
+  </script>
 </body>
 </html>
