@@ -21,210 +21,14 @@
       cursor: none;
     }
 
-    .layout {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 0;
-    }
-
-    .stage {
-      position: relative;
-      overflow: hidden;
-      background: transparent;
-    }
-
     #canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
     }
 
-    .sidebar {
-      position: relative;
-      z-index: 30;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      pointer-events: auto;
-      user-select: none;
-      padding: 1.25rem;
-      border-right: 1px solid rgba(184, 212, 232, 0.12);
-      background: linear-gradient(180deg, rgba(10, 14, 26, 0.55), rgba(5, 8, 16, 0.25));
-    }
-
-    .panel {
-      background: rgba(10, 14, 26, 0.55);
-      border: 1px solid rgba(184, 212, 232, 0.18);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 0.7rem 0.75rem;
-      color: rgba(220, 235, 255, 0.85);
-    }
-
-    .panel-title {
-      font-size: 0.8rem;
-      letter-spacing: 0.18em;
-      color: rgba(200, 220, 255, 0.75);
-      margin-bottom: 0.5rem;
-    }
-
-    .mini {
-      width: 100%;
-      height: 86px;
-      display: block;
-      border: 1px solid rgba(184, 212, 232, 0.14);
-      background: rgba(0, 0, 0, 0.12);
-    }
-
-    #panelAudio.hot {
-      border-color: rgba(255, 150, 140, 0.35);
-      box-shadow:
-        0 0 0 1px rgba(255, 150, 140, 0.12),
-        0 0 24px rgba(255, 150, 140, 0.12);
-    }
-
-    .pill.big {
-      font-size: 0.92rem;
-      letter-spacing: 0.12em;
-      padding: 0.2rem 0.55rem;
-      color: rgba(245, 250, 255, 0.92);
-      border-color: rgba(220, 235, 255, 0.28);
-      background: rgba(184, 212, 232, 0.12);
-    }
-
-    .mini.video {
-      height: 96px;
-      object-fit: cover;
-      border: 1px solid rgba(184, 212, 232, 0.14);
-      background: rgba(0, 0, 0, 0.12);
-    }
-
-    .cam-wrap {
-      position: relative;
-      width: 100%;
-      height: 96px;
-      border: 1px solid rgba(184, 212, 232, 0.14);
-      background: rgba(0, 0, 0, 0.12);
-      overflow: hidden;
-    }
-
-    .cam-wrap > video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border: none;
-      background: transparent;
-    }
-
-    .cam-wrap > canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .btn.small {
-      padding: 0.45rem 0.6rem;
-      font-size: 0.78rem;
-      letter-spacing: 0.16em;
-    }
-
-    .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      color: rgba(210, 230, 255, 0.75);
-    }
-
-    .pill {
-      padding: 0.15rem 0.45rem;
-      border: 1px solid rgba(184, 212, 232, 0.22);
-      color: rgba(220, 235, 255, 0.85);
-      background: rgba(184, 212, 232, 0.08);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      white-space: nowrap;
-    }
-
-    .critique {
-      font-size: 3.2rem;
-      line-height: 1.0;
-      letter-spacing: 0.1em;
-      color: rgba(245, 250, 255, 0.99);
-      min-height: 3.0em;
-      text-align: center;
-      text-shadow:
-        0 0 18px rgba(180, 220, 255, 0.25),
-        0 0 40px rgba(150, 200, 255, 0.18);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 0.55rem 0.7rem;
-      font-family: inherit;
-      font-size: 0.85rem;
-      letter-spacing: 0.18em;
-      color: rgba(220, 235, 255, 0.9);
-      background: rgba(184, 212, 232, 0.08);
-      border: 1px solid rgba(184, 212, 232, 0.25);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn:hover {
-      background: rgba(184, 212, 232, 0.14);
-      border-color: rgba(184, 212, 232, 0.42);
-      color: rgba(255, 255, 255, 0.95);
-    }
-
-    .saved-list {
-      margin-top: 0.6rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      max-height: 160px;
-      overflow: auto;
-      padding-right: 0.25rem;
-    }
-
-    .thumb {
-      border: 1px solid rgba(184, 212, 232, 0.16);
-      background: rgba(0,0,0,0.12);
-      height: 70px;
-      width: 100%;
-      display: block;
-    }
-
-    .thumb-meta {
-      margin-top: 0.25rem;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      color: rgba(200, 220, 255, 0.65);
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-
-    @media (max-width: 740px) {
-      .layout {
-        grid-template-columns: 300px 1fr;
-      }
-      .sidebar { padding: 0.75rem; }
-    }
     .ui {
-      position: absolute;
+      position: fixed;
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
@@ -259,7 +63,7 @@
     }
 
     .status {
-      position: absolute;
+      position: fixed;
       top: 2rem;
       left: 50%;
       transform: translateX(-50%);
@@ -274,7 +78,7 @@
     }
 
     .btn-start {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -305,88 +109,23 @@
   </style>
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      <section class="panel" id="panelCam">
-        <div class="panel-title">摄像头 · 手势交互</div>
-        <div class="cam-wrap">
-          <video id="camVideo" autoplay muted playsinline></video>
-          <canvas id="camFx"></canvas>
-        </div>
-        <div class="row" style="margin-top: 0.45rem;">
-          <span>手势</span>
-          <span class="pill" id="handPill">—</span>
-        </div>
-        <button class="btn small" id="btnCam" style="margin-top: 0.5rem;">开启摄像头</button>
-      </section>
-
-      <section class="panel" id="panelAudio">
-        <div class="panel-title">声学观察</div>
-        <div class="row" style="margin-bottom: 0.45rem;">
-          <span>来源</span>
-          <span class="pill" id="sourcePill">麦克风</span>
-        </div>
-        <canvas class="mini" id="miniMeter" width="440" height="160"></canvas>
-        <div class="row" style="margin-top: 0.45rem;">
-          <span>响度</span>
-          <span class="pill big" id="loudnessPill">0%</span>
-        </div>
-        <div class="row" style="margin-top: 0.3rem;">
-          <span>当前分贝</span>
-          <span class="pill big" id="dbPill">— dB</span>
-        </div>
-      </section>
-
-      <section class="panel" id="panelCritique">
-        <div class="panel-title">声音批评</div>
-        <div class="critique" id="critiqueText">等待声音…</div>
-        <div class="row" style="margin-top: 0.5rem;">
-          <span>清晰度</span>
-          <span class="pill" id="clarityPill">—</span>
-        </div>
-      </section>
-
-      <section class="panel" id="panelSave">
-        <div class="panel-title">雪花样式库</div>
-        <button class="btn" id="btnSave">保存当前雪花样式</button>
-        <div class="saved-list" id="savedList"></div>
-      </section>
-    </aside>
-
-    <main class="stage" id="stage">
-      <canvas id="canvas"></canvas>
-      <p class="status" id="status">点击下方按钮，允许麦克风后开始</p>
-      <button class="btn-start" id="btnStart">开启声音艺术</button>
-      <div class="ui">
-        <p class="hint">声音越大 · 小雪花聚集成大雪花</p>
-        <div class="volume-bar">
-          <div class="volume-fill" id="volumeFill"></div>
-        </div>
-      </div>
-    </main>
+  <canvas id="canvas"></canvas>
+  <p class="status" id="status">点击下方按钮，允许麦克风后开始</p>
+  <button class="btn-start" id="btnStart">开启声音艺术</button>
+  <div class="ui">
+    <p class="hint">声音越大 · 小雪花聚集成大雪花</p>
+    <div class="volume-bar">
+      <div class="volume-fill" id="volumeFill"></div>
+    </div>
   </div>
 
   <script>
     (function () {
-      const stage = document.getElementById('stage');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       const statusEl = document.getElementById('status');
       const btnStart = document.getElementById('btnStart');
       const volumeFill = document.getElementById('volumeFill');
-      const miniMeter = document.getElementById('miniMeter');
-      const meterCtx = miniMeter.getContext('2d');
-      const loudnessPill = document.getElementById('loudnessPill');
-      const dbPill = document.getElementById('dbPill');
-      const critiqueText = document.getElementById('critiqueText');
-      const clarityPill = document.getElementById('clarityPill');
-      const btnSave = document.getElementById('btnSave');
-      const savedList = document.getElementById('savedList');
-      const camVideo = document.getElementById('camVideo');
-      const btnCam = document.getElementById('btnCam');
-      const handPill = document.getElementById('handPill');
-      const camFx = document.getElementById('camFx');
-      const camFxDrawCtx = camFx.getContext('2d');
 
       let width, height, centerX, centerY;
       let particles = [];
@@ -404,29 +143,6 @@
       let frequencyData = null; // 频率数据用于更丰富的视觉效果
       let stars = []; // 背景星空
       let backgroundSnowflakes = []; // 背景浮动小雪花
-      let lastRms = 0;
-      let lastCentroid = 0;
-      let lastZcr = 0;
-      let critiqueCooldown = 0;
-      const savedStyles = [];
-      let stormMode = false;
-      let rainDrops = [];
-      let lightning = 0;
-      let camStream = null;
-      let camOn = false;
-      let handStrength = 0;
-      let handStrengthSmooth = 0;
-      let handOpen = false;
-      let handCx = 0.5; // 0..1 in camera fx space
-      let handCy = 0.6; // 0..1 in camera fx space
-      const camCanvas = document.createElement('canvas');
-      const camCtx = camCanvas.getContext('2d', { willReadFrequently: true });
-      let prevHand = null;
-      const camFxCanvas = document.createElement('canvas');
-      const camFxCtx = camFxCanvas.getContext('2d', { willReadFrequently: true });
-      let camFxW = 0;
-      let camFxH = 0;
-      let camFxCooldown = 0;
 
       // 绘制大雪花外轮廓边缘闪光效果
       function drawSnowflakeOutlineGlow(ctx, centerX, centerY, radius, formation, smoothVolume, time) {
@@ -753,30 +469,14 @@
         }
       }
 
-      function initRain() {
-        rainDrops = [];
-        const count = Math.floor((width * height) / 12000);
-        for (let i = 0; i < count; i++) {
-          rainDrops.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            l: 10 + Math.random() * 26,
-            s: 5 + Math.random() * 10,
-            a: 0.15 + Math.random() * 0.25,
-          });
-        }
-      }
-
       function resize() {
-        const rect = stage.getBoundingClientRect();
-        width = canvas.width = Math.max(1, Math.floor(rect.width));
-        height = canvas.height = Math.max(1, Math.floor(rect.height));
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
         centerX = width / 2;
         centerY = height / 2;
         snowflakePoints = generateSnowflakePoints();
         initStars();
         initBackgroundSnowflakes();
-        initRain();
         if (particles.length === 0) {
           initParticles();
         } else {
@@ -827,7 +527,6 @@
 
       async function startAudio() {
         try {
-          if (started) return;
           stream = await navigator.mediaDevices.getUserMedia({ 
             audio: {
               echoCancellation: false,
@@ -836,9 +535,6 @@
             } 
           });
           audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-          }
           analyser = audioContext.createAnalyser();
           analyser.fftSize = 512; // 增加FFT大小以获得更精细的频率分析
           analyser.smoothingTimeConstant = 0.3; // 降低平滑度，提高响应速度
@@ -851,7 +547,7 @@
           btnStart.classList.add('hidden');
           started = true;
         } catch (e) {
-          statusEl.textContent = '无法使用麦克风：请允许权限，并用 localhost 或 HTTPS 打开';
+          statusEl.textContent = '无法使用麦克风，请检查权限或使用 HTTPS';
           console.error(e);
         }
       }
@@ -870,377 +566,28 @@
         
         // 计算RMS（均方根）音量，对细微声音更敏感
         let sumSquares = 0;
-        let zcrCount = 0;
-        let prev = (timeData[0] - 128) / 128;
         for (let i = 0; i < timeData.length; i++) {
           const normalized = (timeData[i] - 128) / 128;
           sumSquares += normalized * normalized;
-          if (i > 0) {
-            if ((normalized >= 0 && prev < 0) || (normalized < 0 && prev >= 0)) zcrCount++;
-            prev = normalized;
-          }
         }
         const rms = Math.sqrt(sumSquares / timeData.length);
-        const zcr = zcrCount / timeData.length;
         
         // 计算频率数据的加权平均（中高频权重更高，人声更敏感）
         let weightedSum = 0;
         let weightSum = 0;
-        let centroidNum = 0;
-        let centroidDen = 0;
         for (let i = 0; i < freqData.length; i++) {
           const weight = 1 + (i / freqData.length) * 2; // 高频权重更高
           weightedSum += freqData[i] * weight;
           weightSum += weight;
-          centroidNum += i * freqData[i];
-          centroidDen += freqData[i];
         }
         const freqVolume = weightedSum / weightSum / 255;
-        const centroid = centroidDen > 0 ? (centroidNum / centroidDen) / freqData.length : 0;
         
         // 结合RMS和频率数据，并应用增益放大
         const combinedVolume = Math.max(rms * 1.8, freqVolume * 1.5); // 增益放大
-        lastRms = rms;
-        lastCentroid = centroid;
-        lastZcr = zcr;
         return Math.min(1, combinedVolume * 1.2); // 轻微压缩，让低音量也能有反应
       }
 
-      function drawMiniMeter() {
-        const w = miniMeter.width;
-        const h = miniMeter.height;
-        meterCtx.clearRect(0, 0, w, h);
-        meterCtx.fillStyle = 'rgba(0,0,0,0.15)';
-        meterCtx.fillRect(0, 0, w, h);
-
-        // 音量条
-        const v = Math.min(1, Math.max(0, smoothVolume));
-        const db = v * 300; // 0..300
-        const barW = Math.floor(w * v);
-        const grad = meterCtx.createLinearGradient(0, 0, w, 0);
-        // 颜色随分贝升高而变“热”
-        const hot = Math.max(0, Math.min(1, (db - 190) / 90)); // 190..280
-        grad.addColorStop(0, `rgba(${Math.round(126 + hot * 90)}, ${Math.round(184 - hot * 40)}, ${Math.round(218 - hot * 120)}, 0.65)`);
-        grad.addColorStop(0.6, `rgba(${Math.round(184 + hot * 55)}, ${Math.round(212 - hot * 80)}, ${Math.round(232 - hot * 140)}, 0.75)`);
-        grad.addColorStop(1, `rgba(${Math.round(255)}, ${Math.round(255 - hot * 160)}, ${Math.round(255 - hot * 160)}, 0.65)`);
-        meterCtx.fillStyle = grad;
-        // 大条更醒目
-        meterCtx.fillRect(0, h - 24, barW, 16);
-
-        // 峰值保持线（简单 peak-hold）
-        drawMiniMeter.peak = Math.max(v, (drawMiniMeter.peak || 0) * 0.96);
-        const peakX = Math.floor(w * drawMiniMeter.peak);
-        meterCtx.fillStyle = `rgba(255, 255, 255, ${0.45 + hot * 0.35})`;
-        meterCtx.fillRect(Math.max(0, peakX - 1), h - 28, 2, 24);
-
-        // 频谱（上半部分）
-        if (frequencyData) {
-          const bins = frequencyData.length;
-          const step = Math.max(1, Math.floor(bins / 80));
-          const maxH = h - 28;
-          meterCtx.strokeStyle = `rgba(200,220,255,${0.35 + v * 0.35})`;
-          meterCtx.lineWidth = 1.25;
-          meterCtx.beginPath();
-          let x = 0;
-          for (let i = 0; i < bins; i += step) {
-            const val = frequencyData[i] / 255;
-            const y = maxH - val * (maxH - 6);
-            if (x === 0) meterCtx.moveTo(x, y);
-            else meterCtx.lineTo(x, y);
-            x += w / (bins / step);
-          }
-          meterCtx.stroke();
-
-          // 频谱填充（更明显）
-          meterCtx.lineTo(w, maxH);
-          meterCtx.lineTo(0, maxH);
-          meterCtx.closePath();
-          meterCtx.fillStyle = `rgba(126,184,218,${0.08 + v * 0.12})`;
-          meterCtx.fill();
-        }
-
-        loudnessPill.textContent = `${Math.round(v * 100)}%`;
-        dbPill.textContent = `${db.toFixed(1)} dB`;
-
-        // 面板热区提示
-        const panelAudio = document.getElementById('panelAudio');
-        if (panelAudio) {
-          if (db >= 220) panelAudio.classList.add('hot');
-          else panelAudio.classList.remove('hot');
-        }
-      }
-
-      function updateCritique() {
-        // 用 centroid（明亮度）、zcr（嘶噪/尖锐感）、rms（响度）给出“批评”
-        const v = smoothVolume;
-        const centroid = lastCentroid;
-        const zcr = lastZcr;
-
-        // 清晰度：明亮且不过分尖锐时更清晰
-        const clarityScore = Math.max(0, Math.min(1, centroid * 1.2 - zcr * 0.9));
-        clarityPill.textContent = `${Math.round(clarityScore * 100)}%`;
-
-        if (critiqueCooldown > 0) {
-          critiqueCooldown--;
-          return;
-        }
-
-        if (v < 0.03) {
-          critiqueText.textContent = '等待声音…';
-          critiqueCooldown = 12;
-          return;
-        }
-
-        // emoji 规则：按“当前分贝”区间直接映射
-        // 5-15 ❤️，15-30 🙂，30-60 🌸，60-90 👏，90-120 🎤，120-190 💃，190-220 ❗，220-280 😡
-        //（<5 视为安静；>280 视为噪音）
-        const currentDb = smoothVolume * 300;
-        if (currentDb < 5) critiqueText.textContent = '…';
-        else if (currentDb < 15) critiqueText.textContent = '❤️';
-        else if (currentDb < 30) critiqueText.textContent = '🙂';
-        else if (currentDb < 60) critiqueText.textContent = '🌸';
-        else if (currentDb < 90) critiqueText.textContent = '👏';
-        else if (currentDb < 120) critiqueText.textContent = '🎤';
-        else if (currentDb < 190) critiqueText.textContent = '💃';
-        else if (currentDb < 220) critiqueText.textContent = '❗';
-        else if (currentDb <= 280) critiqueText.textContent = '😡';
-        else critiqueText.textContent = '😡';
-        critiqueCooldown = 18;
-      }
-
-      function renderSavedList() {
-        savedList.innerHTML = '';
-        for (let i = savedStyles.length - 1; i >= 0; i--) {
-          const s = savedStyles[i];
-          const wrap = document.createElement('div');
-          const c = document.createElement('canvas');
-          c.className = 'thumb';
-          c.width = 280;
-          c.height = 140;
-          const cctx = c.getContext('2d');
-          cctx.fillStyle = 'rgba(5, 8, 16, 1)';
-          cctx.fillRect(0, 0, c.width, c.height);
-
-          // 画一个缩略版大雪花：骨架 + 外轮廓闪光（静态）
-          const cx = c.width / 2;
-          const cy = c.height / 2;
-          const r = Math.min(c.width, c.height) * 0.32;
-          // 骨架
-          for (let a = 0; a < 6; a++) {
-            const ang = (a / 6) * Math.PI * 2;
-            const ex = cx + Math.cos(ang) * r;
-            const ey = cy + Math.sin(ang) * r;
-            drawSnowflakeSkeleton(cctx, cx, cy, ex, ey, r * 0.8, s.hue, s.sat, 0.45);
-          }
-          // 外轮廓发光（用保存时刻的强度）
-          drawSnowflakeOutlineGlow(cctx, cx, cy, r, s.formation, s.volume, s.time);
-
-          const meta = document.createElement('div');
-          meta.className = 'thumb-meta';
-          meta.innerHTML = `<span>${new Date(s.ts).toLocaleTimeString()}</span><span>${Math.round(s.volume * 100)}%</span>`;
-
-          c.addEventListener('click', () => {
-            // 导出缩略图 PNG
-            const a = document.createElement('a');
-            a.download = `snowflake-style-${s.ts}.png`;
-            a.href = c.toDataURL('image/png');
-            a.click();
-          });
-
-          wrap.appendChild(c);
-          wrap.appendChild(meta);
-          savedList.appendChild(wrap);
-        }
-      }
-
-      btnSave.addEventListener('click', () => {
-        savedStyles.push({
-          ts: Date.now(),
-          hue: 200,
-          sat: 55,
-          formation: formation,
-          volume: smoothVolume,
-          time: time,
-        });
-        if (savedStyles.length > 10) savedStyles.shift();
-        renderSavedList();
-      });
-
-      async function startCamera() {
-        try {
-          camStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: 'user',
-              width: { ideal: 640 },
-              height: { ideal: 480 }
-            },
-            audio: false
-          });
-          camVideo.srcObject = camStream;
-          camOn = true;
-          btnCam.textContent = '关闭摄像头';
-          handPill.textContent = '等待手势…';
-        } catch (e) {
-          camOn = false;
-          handPill.textContent = '权限失败';
-          console.error(e);
-        }
-      }
-
-      function stopCamera() {
-        if (camStream) {
-          for (const t of camStream.getTracks()) t.stop();
-        }
-        camStream = null;
-        camOn = false;
-        btnCam.textContent = '开启摄像头';
-        handPill.textContent = '—';
-        prevHand = null;
-        camFxDrawCtx.clearRect(0, 0, camFx.width, camFx.height);
-      }
-
-      btnCam.addEventListener('click', () => {
-        if (camOn) stopCamera();
-        else startCamera();
-      });
-
-      function updateHandGesture() {
-        if (!camOn) return;
-        if (!camVideo.videoWidth || !camVideo.videoHeight) return;
-
-        // 降采样尺寸：性能关键
-        const desiredW = 160;
-        const desiredH = 120;
-        if (camFxW !== desiredW || camFxH !== desiredH) {
-          camFxW = desiredW;
-          camFxH = desiredH;
-          camFxCanvas.width = camFxW;
-          camFxCanvas.height = camFxH;
-        }
-
-        // 镜像绘制
-        camFxCtx.save();
-        camFxCtx.clearRect(0, 0, camFxW, camFxH);
-        camFxCtx.translate(camFxW, 0);
-        camFxCtx.scale(-1, 1);
-        camFxCtx.drawImage(camVideo, 0, 0, camFxW, camFxH);
-        camFxCtx.restore();
-
-        const img = camFxCtx.getImageData(0, 0, camFxW, camFxH).data;
-        // 简易“肤色 + 运动”启发式：估计手部占比与中心点
-        let count = 0;
-        let sumX = 0;
-        let sumY = 0;
-        let motion = 0;
-        const gray = new Uint8Array(camFxW * camFxH);
-
-        for (let y = 0; y < camFxH; y++) {
-          for (let x = 0; x < camFxW; x++) {
-            const idx = (y * camFxW + x) * 4;
-            const r = img[idx], g = img[idx + 1], b = img[idx + 2];
-            const p = y * camFxW + x;
-            const lum = (r * 0.299 + g * 0.587 + b * 0.114) | 0;
-            gray[p] = lum;
-
-            // YCbCr-ish skin rule (rough)
-            const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-            const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-            const skin = cr > 140 && cr < 185 && cb > 90 && cb < 135 && r > 60;
-
-            if (skin) {
-              count++;
-              sumX += x;
-              sumY += y;
-            }
-          }
-        }
-
-        if (prevHand) {
-          // 运动量：平均帧差
-          let diffSum = 0;
-          for (let i = 0; i < gray.length; i++) diffSum += Math.abs(gray[i] - prevHand[i]);
-          motion = diffSum / gray.length; // 0-255
-        }
-        prevHand = gray;
-
-        const areaFrac = count / (camFxW * camFxH);
-        const cx = count > 0 ? sumX / count : camFxW * 0.5;
-        const cy = count > 0 ? sumY / count : camFxH * 0.6;
-        handCx += ((cx / camFxW) - handCx) * 0.25;
-        handCy += ((cy / camFxH) - handCy) * 0.25;
-
-        // “张开”近似：手面积更大 + 运动更明显
-        const motionN = Math.min(1, Math.max(0, (motion - 4) / 18));
-        const rawStrength = Math.min(1, Math.max(0, areaFrac * 6 + motionN * 0.8));
-        handStrength += (rawStrength - handStrength) * 0.35;
-        handStrengthSmooth += (handStrength - handStrengthSmooth) * 0.2;
-
-        handOpen = areaFrac > 0.08 || (areaFrac > 0.05 && motionN > 0.35);
-        handPill.textContent = handOpen ? `张开 ${Math.round(handStrengthSmooth * 100)}%` : `未检测 ${Math.round(handStrengthSmooth * 100)}%`;
-      }
-
-      function drawHandDbSegments(currentDb) {
-        if (!camOn) return;
-
-        // 覆盖层 canvas 尺寸（跟随 cam-wrap）
-        const rect = camVideo.getBoundingClientRect();
-        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-        const targetW = Math.max(1, Math.floor(rect.width * dpr));
-        const targetH = Math.max(1, Math.floor(rect.height * dpr));
-        if (camFx.width !== targetW || camFx.height !== targetH) {
-          camFx.width = targetW;
-          camFx.height = targetH;
-        }
-
-        camFxDrawCtx.clearRect(0, 0, camFx.width, camFx.height);
-
-        const cx = handCx * camFx.width;
-        const cy = handCy * camFx.height;
-        const dbN = Math.max(0, Math.min(1, currentDb / 300));
-        const interact = handOpen ? (0.25 + handStrengthSmooth * 0.75) : 0.12;
-        const baseLen = (0.22 + dbN * 0.65) * Math.min(camFx.width, camFx.height);
-        const len = baseLen * (0.55 + interact);
-        const segments = 18;
-
-        // 背后淡光晕
-        const glow = camFxDrawCtx.createRadialGradient(cx, cy, 0, cx, cy, len * 0.55);
-        glow.addColorStop(0, `rgba(160, 210, 255, ${0.12 * interact})`);
-        glow.addColorStop(1, 'transparent');
-        camFxDrawCtx.fillStyle = glow;
-        camFxDrawCtx.beginPath();
-        camFxDrawCtx.arc(cx, cy, len * 0.55, 0, Math.PI * 2);
-        camFxDrawCtx.fill();
-
-        for (let i = 0; i < segments; i++) {
-          const a = (i / segments) * Math.PI * 2 + Math.sin(time * 0.9 + i) * 0.06 * interact;
-          const wobble = 0.9 + Math.sin(time * 2.2 + i * 1.7) * 0.12 * interact;
-          const l = len * wobble * (0.55 + Math.sin(i * 2.0) * 0.08);
-          const x2 = cx + Math.cos(a) * l;
-          const y2 = cy + Math.sin(a) * l;
-
-          const alpha = 0.22 + dbN * 0.35 + interact * 0.18;
-          camFxDrawCtx.strokeStyle = `rgba(200, 230, 255, ${alpha})`;
-          camFxDrawCtx.lineWidth = (handOpen ? 2.2 : 1.3) * dpr;
-          camFxDrawCtx.lineCap = 'round';
-          camFxDrawCtx.beginPath();
-          camFxDrawCtx.moveTo(cx, cy);
-          camFxDrawCtx.lineTo(x2, y2);
-          camFxDrawCtx.stroke();
-
-          // 端点亮点
-          const r = (handOpen ? 3.5 : 2.2) * dpr;
-          const g = camFxDrawCtx.createRadialGradient(x2, y2, 0, x2, y2, r * 2.2);
-          g.addColorStop(0, `rgba(240, 250, 255, ${alpha * 0.8})`);
-          g.addColorStop(1, 'transparent');
-          camFxDrawCtx.fillStyle = g;
-          camFxDrawCtx.beginPath();
-          camFxDrawCtx.arc(x2, y2, r * 2.2, 0, Math.PI * 2);
-          camFxDrawCtx.fill();
-        }
-      }
-
       btnStart.addEventListener('click', startAudio);
-      btnStart.addEventListener('pointerdown', startAudio, { passive: true });
 
       function animate() {
         time += 0.016; // 约60fps的时间增量
@@ -1256,75 +603,26 @@
         smoothVolume += (volume - smoothVolume) * 0.25; // 提高响应速度
         volume = getVolume();
 
-        // 当前“艺术化分贝”
-        const currentDb = smoothVolume * 300;
-        // 275 dB：雪花盛放到最明显；>=280 dB：狂风暴雨
-        const bloomPeak = currentDb >= 275 && currentDb < 280;
-        const bloom = bloomPeak ? 1 : Math.max(0, Math.min(1, (currentDb - 235) / 40)); // 235→275 逐渐盛放
-        stormMode = !bloomPeak && currentDb >= 280;
-
-        // 暴雨模式的闪电
-        if (stormMode) {
-          if (Math.random() < 0.02) lightning = 1;
-          lightning *= 0.85;
-        } else {
-          lightning *= 0.9;
-        }
-
         // 音量越大，formation 越接近 1，粒子越聚成雪花；更敏感的反应
-        const targetFormationBase = Math.min(1, smoothVolume * 3.2);
-        const targetFormation = stormMode ? 0.08 : (bloomPeak ? 1 : Math.min(1, targetFormationBase + bloom * 0.55));
-        const formationSpeed = stormMode ? 0.18 : (bloomPeak ? 0.22 : ((smoothVolume > 0.2 ? 0.08 : 0.03) + bloom * 0.07));
+        const targetFormation = Math.min(1, smoothVolume * 3.2);
+        const formationSpeed = smoothVolume > 0.2 ? 0.08 : 0.03; // 更快的成型速度
         formation += (targetFormation - formation) * formationSpeed;
 
         // 更敏感的粒子激活，低音量也能看到更多粒子，更密集
         const activeCount = Math.floor(PARTICLE_COUNT * (0.4 + smoothVolume * 0.6));
-        const baseSpeed = (stormMode ? 0.9 : 0.25) + smoothVolume * (stormMode ? 3.4 : 2.3) + bloom * 0.7 + (bloomPeak ? 0.35 : 0);
-        const jitter = (stormMode ? 0.8 : 0.12) + (1 - formation) * (stormMode ? 2.2 : (bloomPeak ? 0.45 : 0.9));
-
-        // 风（暴雨模式）
-        const windX = stormMode ? (-6 - smoothVolume * 18) : 0;
-        const windY = stormMode ? (2 + smoothVolume * 6) : 0;
+        const baseSpeed = 0.25 + smoothVolume * 2.3;
+        const jitter = 0.12 + (1 - formation) * 0.9;
 
         // 根据音量动态调整背景淡出速度（更细腻的过渡）
-        const fadeAlpha = stormMode ? 0.22 : (0.1 + (1 - smoothVolume) * 0.1);
+        const fadeAlpha = 0.1 + (1 - smoothVolume) * 0.1;
         ctx.fillStyle = `rgba(5, 8, 16, ${fadeAlpha})`;
         ctx.fillRect(0, 0, width, height);
-
-        // 暴雨与闪电（只在暴雨模式）
-        if (stormMode) {
-          // 闪电泛白
-          if (lightning > 0.05) {
-            ctx.fillStyle = `rgba(220, 240, 255, ${0.18 * lightning})`;
-            ctx.fillRect(0, 0, width, height);
-          }
-          // 雨线
-          ctx.lineCap = 'round';
-          for (const d of rainDrops) {
-            d.x += windX * 0.9 + d.s;
-            d.y += windY + d.s * 1.3;
-            if (d.x < -60) d.x = width + 60;
-            if (d.y > height + 60) {
-              d.y = -60;
-              d.x = Math.random() * width;
-            }
-            const x2 = d.x - windX * 0.6;
-            const y2 = d.y - d.l;
-            ctx.strokeStyle = `rgba(190, 220, 255, ${d.a})`;
-            ctx.lineWidth = 1.1;
-            ctx.beginPath();
-            ctx.moveTo(d.x, d.y);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-          }
-        }
 
         // 绘制背景星空
         for (const star of stars) {
           star.twinkle += 0.02;
           const twinkleBrightness = 0.5 + Math.sin(star.twinkle) * 0.5;
-          const starAlpha = stormMode ? 0.08 : 0.4;
-          ctx.fillStyle = `rgba(200, 220, 255, ${star.brightness * twinkleBrightness * starAlpha})`;
+          ctx.fillStyle = `rgba(200, 220, 255, ${star.brightness * twinkleBrightness * 0.4})`;
           ctx.beginPath();
           ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
           ctx.fill();
@@ -1336,8 +634,8 @@
           
           // 更新位置（浮动效果）
           sf.phase += 0.01;
-          sf.x += sf.floatX * (0.5 + Math.sin(sf.phase) * 0.5) + windX * 0.12;
-          sf.y += sf.floatY + windY * 0.12;
+          sf.x += sf.floatX * (0.5 + Math.sin(sf.phase) * 0.5);
+          sf.y += sf.floatY;
           sf.rotation += sf.rotationSpeed;
           
           // 边界循环
@@ -1358,7 +656,7 @@
               sf.rotation,
               sf.hue,
               sf.saturation,
-              stormMode ? sf.alpha * 0.6 : sf.alpha,
+              sf.alpha,
               sf.detail
             );
           }
@@ -1375,7 +673,7 @@
 
           // 雪花吸引力
           if (t > 0.01) {
-            const pull = (stormMode ? 0.006 : 0.02) + t * (stormMode ? 0.02 : (0.08 + bloom * 0.04));
+            const pull = 0.02 + t * 0.08;
             p.vx += (dx / (dist + 1)) * pull;
             p.vy += (dy / (dist + 1)) * pull;
           }
@@ -1383,9 +681,6 @@
           // 随机扰动
           p.vx += (Math.random() - 0.5) * jitter;
           p.vy += (Math.random() - 0.5) * jitter;
-          // 风
-          p.vx += windX * 0.02;
-          p.vy += windY * 0.02;
           p.vx *= 0.92;
           p.vy *= 0.92;
           p.x += p.vx * baseSpeed * p.speed;
@@ -1425,7 +720,7 @@
         }
 
         // 绘制雪花骨架连接线（小雪花聚集成大雪花时的骨架形态）
-        if (!stormMode && formation > 0.15) {
+        if (formation > 0.2) {
           const maxConnections = Math.min(activeCount, 700);
           // 连接距离随formation增大，形成大雪花时连接更远
           const connectionDistance = 50 * (1 + formation * 1.5 + smoothVolume * 0.6);
@@ -1550,9 +845,9 @@
         }
 
         // 高音量时的中心大光晕效果（增强，让大雪花形态更明显）
-        if (!stormMode && (smoothVolume > 0.22 || bloomPeak) && formation > 0.22) {
-          const centerGlowSize = (0.22 + smoothVolume) * Math.min(width, height) * 0.62 * (1 + formation * 0.65);
-          const glowIntensity = (0.25 + smoothVolume) * formation * (bloomPeak ? 1.8 : 1.2);
+        if (smoothVolume > 0.25 && formation > 0.3) {
+          const centerGlowSize = smoothVolume * Math.min(width, height) * 0.75 * (1 + formation * 0.5);
+          const glowIntensity = smoothVolume * formation * 1.2;
           
           // 外层大光晕（增强）
           const outerGradient = ctx.createRadialGradient(
@@ -1598,15 +893,10 @@
           ctx.fill();
           
           // 绘制大雪花外轮廓边缘闪光效果
-          const outlineRadius = centerGlowSize * (0.6 + bloom * 0.25); // 盛放时轮廓更外扩
+          const outlineRadius = centerGlowSize * 0.6; // 外轮廓半径
           drawSnowflakeOutlineGlow(ctx, centerX, centerY, outlineRadius, formation, smoothVolume, time);
         }
 
-        drawMiniMeter();
-        updateCritique();
-        updateHandGesture();
-        // 用当前分贝驱动线段交互
-        drawHandDbSegments(smoothVolume * 300);
         volumeFill.style.width = (smoothVolume * 100) + '%';
         animationId = requestAnimationFrame(animate);
       }
