@@ -1,0 +1,71 @@
+/* 核心轮廓页：与全局变量一致，仅布局补充 */
+.layout.core-page {
+  grid-template-rows: auto 1fr;
+}
+
+.core-workbench {
+  display: grid;
+  grid-template-columns: minmax(260px, 300px) 1fr;
+  gap: 20px;
+  align-items: start;
+  min-height: min(68vh, 880px);
+}
+
+.core-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.core-controls label.core-range {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.core-controls input[type="range"] {
+  width: 100%;
+}
+
+.core-stage-wrap {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+}
+
+.core-stage {
+  position: relative;
+  min-height: 300px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: auto;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.core-stage.drag-over {
+  border-color: var(--border-focus);
+  background: #f5f5f5;
+}
+
+#coreBaseCanvas,
+#coreOverlayCanvas {
+  position: absolute;
+  margin: auto;
+  display: block;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+#coreOverlayCanvas {
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .core-workbench {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}

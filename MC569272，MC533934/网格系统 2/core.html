@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>核心图像轮廓</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./core.css" />
+    <script defer src="./core.js"></script>
+  </head>
+  <body>
+    <main class="layout core-page">
+      <header class="header">
+        <h1>核心图像轮廓</h1>
+        <p>
+          上传海报或图片，自动估计前景主体区域，并用红色折线段沿外轮廓勾勒（基于颜色聚类与边界追踪，复杂背景可能需调参数）。
+        </p>
+        <p class="header-subnav">
+          <a href="./index.html">返回网格主页</a>
+        </p>
+      </header>
+
+      <section class="panel core-workbench">
+        <div class="core-controls">
+          <h2>上传与参数</h2>
+          <label class="file-input">
+            <span>选择图片（JPG/PNG）</span>
+            <input id="coreFileInput" type="file" accept="image/png,image/jpeg" />
+          </label>
+          <label class="core-range">
+            识别强度
+            <input id="coreStrengthInput" type="range" min="0" max="100" value="42" />
+            <span id="coreStrengthLabel">42</span>
+          </label>
+          <p class="panel-note">
+            强度越高越「抠紧」主体、轮廓更贴边；松手后自动重算轮廓。支持拖拽与 Ctrl+V 粘贴；⌘/Ctrl+O 选图，Esc 清空。参数会记住到本机。
+          </p>
+          <div class="button-row">
+            <button id="coreRunBtn" type="button" disabled>重新识别轮廓</button>
+            <button id="coreClearBtn" type="button">清空</button>
+          </div>
+          <pre id="coreMeta" class="meta">请先上传图片。</pre>
+        </div>
+
+        <div class="core-stage-wrap">
+          <div id="coreDropZone" class="core-stage">
+            <canvas id="coreBaseCanvas"></canvas>
+            <canvas id="coreOverlayCanvas"></canvas>
+          </div>
+          <p id="coreStatus" class="status">拖拽或选择一张图片开始。</p>
+        </div>
+      </section>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>海报网格识别与检索</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./i18n.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <main class="layout">
+      <header class="header">
+        <div class="header-toolbar">
+          <div class="lang-switch" role="group" data-i18n-aria="langAria">
+            <button type="button" id="langZhBtn" class="lang-btn is-active" data-lang="zh" aria-pressed="true">中文</button>
+            <button type="button" id="langEnBtn" class="lang-btn" data-lang="en" aria-pressed="false">English</button>
+          </div>
+        </div>
+        <h1 data-i18n="pageTitle">海报网格识别与检索</h1>
+        <p data-i18n="headerHint">提示：上传海报自动识别网格，或直接新建网格画布排版；底部分析模块可下滑查看。</p>
+        <p class="header-subnav">
+          <a href="./core.html" data-i18n="headerCoreLink">核心图像轮廓（线段勾勒）</a>
+        </p>
+      </header>
+
+      <section class="workbench">
+        <aside class="panel control-panel">
+          <details id="analysisPanel" class="tool-group tool-group-analysis">
+            <summary data-i18n="analysisSummary">海报分析</summary>
+          <h2 data-i18n="h1Upload">1. 上传与识别</h2>
+          <label class="file-input">
+            <span data-i18n="pickPoster">选择海报（JPG/PNG）</span>
+            <input id="posterInput" type="file" accept="image/png,image/jpeg" />
+          </label>
+          <div class="button-row">
+            <button id="detectBtn" type="button" disabled data-i18n="btnDetect">重新识别网格</button>
+            <button id="clearBtn" type="button" data-i18n="btnClear">清空</button>
+          </div>
+          <p class="panel-note" data-i18n="noteUpload">上传后会在全海报范围内自动识别网格；也可点「重新识别网格」。拖拽或 Ctrl+V 粘贴图片均可载入。</p>
+
+          <h2 data-i18n="h2GridStyle">2. 网格样式</h2>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelCols">列数</span><input id="colsInput" type="number" min="2" max="36" value="12" /></label>
+            <label><span data-i18n="labelRows">行数</span><input id="rowsInput" type="number" min="2" max="36" value="12" /></label>
+            <label><span data-i18n="labelMarginL">左边距</span><input id="marginLeftInput" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="labelMarginR">右边距</span><input id="marginRightInput" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="labelMarginT">上边距</span><input id="marginTopInput" type="number" min="0" value="100" /></label>
+            <label><span data-i18n="labelMarginB">下边距</span><input id="marginBottomInput" type="number" min="0" value="0" /></label>
+            <label><span data-i18n="labelAngle">倾角</span><input id="angleInput" type="number" min="-30" max="30" step="0.1" value="0" /></label>
+            <label><span data-i18n="labelGridColor">网格颜色</span><input id="gridColorInput" type="color" value="#2ec5ff" /></label>
+            <label><span data-i18n="labelGridAlpha">透明度</span><input id="gridAlphaInput" type="range" min="0.1" max="1" step="0.05" value="0.8" /></label>
+            <label><span data-i18n="labelDash">虚线长度</span><input id="dashInput" type="number" min="2" max="30" value="8" /></label>
+            <label><span data-i18n="labelGap">虚线间隔</span><input id="gapInput" type="number" min="2" max="30" value="6" /></label>
+            <label><span data-i18n="labelLineWidth">线宽</span><input id="lineWidthInput" type="number" min="0.5" max="6" step="0.5" value="1.5" /></label>
+          </div>
+          <div class="button-row">
+            <button id="applyGridBtn" type="button" data-i18n="btnApplyGrid">应用网格样式</button>
+            <button id="fitPosterGridBtn" type="button" data-i18n="btnFitPoster">按画布贴合比例</button>
+          </div>
+          <div class="button-row">
+            <button id="confirmGridBtn" type="button" disabled data-i18n="btnConfirmGrid">确认当前网格</button>
+            <span></span>
+          </div>
+          <p class="panel-note" data-i18n="noteGridFit">识别后会自动按整张画布做「列:行」比例的最大内接区，单元格为正方形并与画幅相贴；改列/行后可点「按画布贴合比例」重算。</p>
+          <pre id="gridMeta" class="meta"></pre>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelGridShow">网格显示</span>
+              <select id="analysisGridVisibleSelect">
+                <option value="on" selected data-i18n="optShow">显示</option>
+                <option value="off" data-i18n="optHide">隐藏</option>
+              </select>
+            </label>
+            <span></span>
+          </div>
+
+          <h2 data-i18n="h2Template">模板学习（可复用）</h2>
+          <label><span data-i18n="labelTemplateName">模板名称</span><input id="templateNameInput" type="text" data-i18n-placeholder="phTemplateName" placeholder="例如：品牌竖版主视觉" /></label>
+          <div class="button-row">
+            <button id="learnTemplateBtn" type="button" disabled data-i18n="btnLearnTemplate">学习当前网格</button>
+            <button id="applyTemplateBtn" type="button" disabled data-i18n="btnApplyTemplate">应用选中模板</button>
+          </div>
+          <label><span data-i18n="labelTemplateSelect">已学习模板</span>
+            <select id="templateSelect">
+              <option value="" data-i18n="optNoTemplate">暂无模板</option>
+            </select>
+          </label>
+          <div class="button-row">
+            <button id="deleteTemplateBtn" type="button" disabled data-i18n="btnDeleteTemplate">删除选中模板</button>
+            <span></span>
+          </div>
+
+          <h2 data-i18n="h2Library">3. 归类入库</h2>
+          <label><span data-i18n="labelPosterName">海报名称</span><input id="posterNameInput" type="text" data-i18n-placeholder="phPosterName" placeholder="例如：春季活动海报" /></label>
+          <label><span data-i18n="labelTags">标签（逗号分隔）</span><input id="posterTagsInput" type="text" data-i18n-placeholder="phTags" placeholder="例如：活动,电商,竖版" /></label>
+          <div class="button-row">
+            <button id="savePosterBtn" type="button" disabled data-i18n="btnSaveLibrary">保存到网格库</button>
+          </div>
+          <h2 data-i18n="h2LayoutAnalysis">版面区域分析</h2>
+          <div class="button-row">
+            <button id="analyzeLayoutZonesBtn" type="button" data-i18n="btnAnalyzeZones">分析文字/图片区域</button>
+            <span></span>
+          </div>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelAnalysisOverlay">分析区域叠加</span>
+              <select id="analysisOverlaySelect">
+                <option value="on" selected data-i18n="optShow">显示</option>
+                <option value="off" data-i18n="optHide">隐藏</option>
+              </select>
+            </label>
+            <span></span>
+          </div>
+          <pre id="layoutAnalysisMeta" class="meta" data-i18n="layoutMetaEmpty">尚未分析版面区域。</pre>
+          </details>
+
+          <details id="layoutPanel" class="tool-group tool-group-layout">
+            <summary data-i18n="layoutSummary">海报排版</summary>
+          <h2 data-i18n="h2NewCanvas">4. 新建网格画布排版</h2>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelCanvasW">画布宽度</span><input id="canvasWidthInput" type="number" min="320" max="4000" value="1080" /></label>
+            <label><span data-i18n="labelCanvasH">画布高度</span><input id="canvasHeightInput" type="number" min="320" max="4000" value="1350" /></label>
+            <label><span data-i18n="labelBg">背景色</span><input id="canvasBgInput" type="color" value="#ffffff" /></label>
+            <label><span data-i18n="labelGridBank">网格库</span>
+              <select id="gridBankSelect">
+                <option value="" data-i18n="optNoGridBank">暂无已存网格</option>
+              </select>
+            </label>
+          </div>
+          <div class="button-row">
+            <button id="createCanvasBtn" type="button" data-i18n="btnNewCanvas">新建画布</button>
+            <button id="applyBankGridBtn" type="button" data-i18n="btnApplyBankGrid">应用网格库网格</button>
+          </div>
+          <div class="button-row">
+            <button id="editAnalyzedGridBtn" type="button" data-i18n="btnEditGrid">编辑分析网格</button>
+            <span></span>
+          </div>
+          <div class="button-row">
+            <button id="addTextBlockBtn" type="button" data-i18n="btnAddText">添加文字块</button>
+            <button id="addImageBlockBtn" type="button" data-i18n="btnAddImage">添加图片块</button>
+          </div>
+          <div class="button-row">
+            <button id="autoLayoutBtn" type="button" data-i18n="btnAutoLayout">自动排版(占位)</button>
+            <span></span>
+          </div>
+          <p class="panel-note auto-layout-hint">自动排版会生成多套草案，可在下方卡片中快速对比并切换。</p>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelAutoVariants">AI排版方案</span>
+              <select id="autoLayoutVariantSelect">
+                <option value="" data-i18n="optNoVariants">尚未生成方案</option>
+              </select>
+            </label>
+            <span></span>
+          </div>
+          <div id="autoLayoutVariantCards" class="variant-cards"></div>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelGridShow">网格显示</span>
+              <select id="gridVisibleSelect">
+                <option value="on" selected data-i18n="optShow">显示</option>
+                <option value="off" data-i18n="optHide">隐藏</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelPosterShow">海报显示</span>
+              <select id="posterVisibleSelect">
+                <option value="on" selected data-i18n="optShow">显示</option>
+                <option value="off" data-i18n="optHide">隐藏</option>
+              </select>
+            </label>
+            <span></span>
+          </div>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelFont">字体</span>
+              <select id="textFontFamilySelect">
+                <option value='"PingFang SC","Microsoft YaHei",sans-serif'>苹方 / 微软雅黑</option>
+                <option value='"Helvetica Neue",Arial,sans-serif'>Helvetica / Arial</option>
+                <option value='"Noto Serif SC","Songti SC",serif'>思源宋体 / 宋体</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelFontSize">字号(px)</span><input id="textFontSizeInput" type="number" min="10" max="160" value="32" /></label>
+            <label><span data-i18n="labelFontWeight">字重</span>
+              <select id="textFontWeightSelect">
+                <option value="400" data-i18n="fw400">常规</option>
+                <option value="500" selected data-i18n="fw500">中等</option>
+                <option value="700" data-i18n="fw700">加粗</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelTextColor">字体颜色</span><input id="textColorInput" type="color" value="#171717" /></label>
+          </div>
+          <div class="button-row">
+            <button id="bringForwardBtn" type="button" data-i18n="btnBringFront">图层前移</button>
+            <button id="sendBackwardBtn" type="button" data-i18n="btnSendBack">图层后移</button>
+          </div>
+          <div class="button-row">
+            <button id="undoLayoutBtn" type="button" data-i18n-title="titleUndo" title="撤销（⌘/Ctrl+Z）" data-i18n="btnUndoLayout">撤销排版</button>
+            <button id="redoLayoutBtn" type="button" data-i18n-title="titleRedo" title="重做（⌘/Ctrl+Shift+Z）" data-i18n="btnRedoLayout">重做排版</button>
+          </div>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelOpacity">选中图层不透明度</span>
+              <input id="activeLayerOpacityInput" type="range" min="0" max="100" step="1" value="100" disabled />
+            </label>
+          </div>
+          <div class="layout-align-toolbar" role="group" data-i18n-aria="alignToolbar">
+            <span class="layout-align-label" data-i18n="alignLabel">对齐画布</span>
+            <button type="button" class="layout-align-btn" data-align-layout="left" data-i18n-title="titleAlignL" title="左对齐" data-i18n="alignL">左</button>
+            <button type="button" class="layout-align-btn" data-align-layout="hcenter" data-i18n-title="titleAlignH" title="水平居中" data-i18n="alignH">水平</button>
+            <button type="button" class="layout-align-btn" data-align-layout="right" data-i18n-title="titleAlignR" title="右对齐" data-i18n="alignR">右</button>
+            <button type="button" class="layout-align-btn" data-align-layout="top" data-i18n-title="titleAlignT" title="顶对齐" data-i18n="alignT">顶</button>
+            <button type="button" class="layout-align-btn" data-align-layout="vcenter" data-i18n-title="titleAlignV" title="垂直居中" data-i18n="alignV">垂直</button>
+            <button type="button" class="layout-align-btn" data-align-layout="bottom" data-i18n-title="titleAlignB" title="底对齐" data-i18n="alignB">底</button>
+          </div>
+          <div class="button-row">
+            <button id="deleteActiveItemBtn" type="button" data-i18n="btnDeleteItem">删除选中元素</button>
+            <span></span>
+          </div>
+          <div class="grid-inputs">
+            <label><span data-i18n="labelSnap">吸附网格</span>
+              <select id="snapToGridSelect">
+                <option value="on" selected data-i18n="optSnapOn">开启</option>
+                <option value="off" data-i18n="optSnapOff">关闭</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelSnapTh">吸附阈值(px)</span><input id="snapThresholdInput" type="number" min="2" max="80" value="16" /></label>
+            <label><span data-i18n="labelSnapSpan">贴齐单元跨度</span>
+              <select id="snapSpanSelect">
+                <option value="on" selected data-i18n="optSnapOn">开启</option>
+                <option value="off" data-i18n="optSnapOff">关闭</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelMinSpan">最小跨列/行</span><input id="minSpanInput" type="number" min="1" max="12" value="1" /></label>
+          </div>
+          <div class="button-row">
+            <button id="clearLayoutBtn" type="button" data-i18n="btnClearLayout">清空排版元素</button>
+            <button id="exportLayoutBtn" type="button" data-i18n="btnExportLayout">导出排版图</button>
+          </div>
+          <div class="button-row">
+            <button id="exportGridPngBtn" type="button" data-i18n="btnExportGridPng">导出网格PNG</button>
+            <span></span>
+          </div>
+          <div class="button-row">
+            <button id="duplicateActiveItemBtn" type="button" data-i18n="btnDuplicate">复制选中元素</button>
+            <button id="exportPsdBtn" type="button" data-i18n="btnExportPsd">导出 PSD</button>
+          </div>
+          <div class="button-row">
+            <button id="exportSvgBtn" type="button" data-i18n="btnExportSvg">导出 SVG(AI)</button>
+            <button id="exportIdmlBtn" type="button" data-i18n="btnExportIdml">导出 IDML(INDD)</button>
+          </div>
+          <label data-i18n="labelLayerPanel">图层面板</label>
+          <div id="layerList" class="layer-list"></div>
+          <label><span data-i18n="labelProjectName">排版项目名称</span><input id="layoutProjectNameInput" type="text" data-i18n-placeholder="phProjectName" placeholder="例如：春季活动排版A" /></label>
+          <label><span data-i18n="labelSavedProjects">已保存排版项目</span>
+            <select id="layoutProjectSelect">
+              <option value="" data-i18n="optNoProjects">暂无排版项目</option>
+            </select>
+          </label>
+          <div id="layoutProjectList" class="layout-project-list"></div>
+          <div class="button-row">
+            <button id="saveLayoutProjectBtn" type="button" data-i18n="btnSaveProject">保存当前排版</button>
+            <button id="loadLayoutProjectBtn" type="button" data-i18n="btnLoadProject">载入选中排版</button>
+          </div>
+          <div class="button-row">
+            <button id="deleteLayoutProjectBtn" type="button" data-i18n="btnDeleteProject">删除选中排版</button>
+            <span></span>
+          </div>
+          <input id="layoutImageInput" type="file" accept="image/png,image/jpeg" hidden />
+          <p class="panel-note" data-i18n="noteLayoutPanel">新建空白画布后，可从网格库选网格叠加；在画布上拖拽文字块和图片块进行排版。背景色可直接调整并实时生效。开启吸附后可贴齐网格线，拖拽时按住 Alt 可临时关闭吸附。</p>
+          </details>
+        </aside>
+
+        <section class="panel stage-panel">
+          <div class="stage-toolbar">
+            <label><span data-i18n="labelZoom">缩放</span>
+              <select id="zoomSelect">
+                <option value="fit" selected data-i18n="zoomFit">适应画布</option>
+                <option value="0.75">75%</option>
+                <option value="1">100%</option>
+                <option value="1.25">125%</option>
+              </select>
+            </label>
+          </div>
+          <div id="dropZone" class="stage-wrap">
+            <canvas id="posterCanvas"></canvas>
+            <canvas id="gridCanvas"></canvas>
+            <div id="layoutOverlay" class="layout-overlay"></div>
+            <div id="alignmentGuides" class="alignment-guides"></div>
+            <div id="transformInfo" class="transform-info" hidden></div>
+          </div>
+          <p id="statusText" class="status" data-i18n="statusInitial">请先上传海报，系统将在整张画布上自动识别网格并分析颜色。</p>
+        </section>
+
+        <aside class="panel library-panel">
+          <h2 data-i18n="h2Search">4. 按网格查找海报</h2>
+          <div class="search-bar">
+            <label><span data-i18n="labelSearchCols">列数</span>
+              <input id="searchColsInput" type="number" min="0" value="0" />
+            </label>
+            <label><span data-i18n="labelSearchRows">行数</span>
+              <input id="searchRowsInput" type="number" min="0" value="0" />
+            </label>
+            <label><span data-i18n="labelCategory">分类</span>
+              <select id="searchCategoryInput">
+                <option value="" data-i18n="optCategoryAll">全部</option>
+              </select>
+            </label>
+            <label><span data-i18n="labelKeyword">关键词</span>
+              <input id="searchTextInput" type="text" data-i18n-placeholder="phSearch" placeholder="名称或标签" />
+            </label>
+            <button id="searchBtn" type="button" data-i18n="btnSearch">查找</button>
+            <button id="resetSearchBtn" type="button" data-i18n="btnResetSearch">重置</button>
+          </div>
+          <div id="libraryList" class="library-list"></div>
+        </aside>
+      </section>
+
+      <details class="panel panel-foldable color-extract-panel" aria-labelledby="colorExtractHeading">
+        <summary id="colorExtractHeading" data-i18n="colorPanelTitle">海报颜色提取</summary>
+        <p class="color-extract-hint" data-i18n="colorPanelHint">
+          从当前海报中聚类提取最多 14 种主色，按画面中颜色占比从高到低排列，并给出 RGB 与印刷参考 CMYK（由 RGB 换算）。点击色块可复制 HEX 到剪贴板。
+        </p>
+        <div id="colorPaletteEmpty" class="color-palette-empty" data-i18n="colorEmpty">请先上传海报，颜色将随图片自动分析。</div>
+        <div id="colorPaletteGrid" class="color-palette-grid" hidden></div>
+      </details>
+
+      <details class="panel panel-foldable graphics-meaning-panel" aria-labelledby="graphicsMeaningHeading">
+        <summary id="graphicsMeaningHeading" data-i18n="graphicsPanelTitle">主要图形与寓意</summary>
+        <p class="color-extract-hint" data-i18n="graphicsPanelHint">
+          结合构图能量、视觉重心、主色冷暖与饱和度，界定整体氛围（如活泼、静谧等形容词）并给出图形线索与综合解读；下方可检索寓意词条。结果为启发式参考。
+        </p>
+        <div id="graphicsEmpty" class="color-palette-empty" data-i18n="graphicsEmpty">请先上传海报，将自动分析图形特征并匹配寓意线索。</div>
+        <div id="graphicsContent" class="graphics-content" hidden>
+          <div class="graphics-auto-block">
+            <h3 class="graphics-subhead" data-i18n="gfxFeatures">图形特征</h3>
+            <ul id="graphicsFeatureList" class="graphics-feature-list"></ul>
+            <h3 class="graphics-subhead" data-i18n="gfxMood">氛围界定</h3>
+            <p id="graphicsAtmosphere" class="graphics-atmosphere"></p>
+            <h3 class="graphics-subhead" data-i18n="gfxInterpret">综合解读</h3>
+            <p id="graphicsInterpretation" class="graphics-interpretation"></p>
+          </div>
+          <h3 class="graphics-subhead" data-i18n="semanticsSearchTitle">寓意词条检索</h3>
+          <label class="semantics-search-label">
+            <span data-i18n="labelSemanticsKeyword">关键词</span>
+            <input type="search" id="semanticsSearchInput" data-i18n-placeholder="phSemantics" placeholder="例如：留白、对称、动感" autocomplete="off" />
+          </label>
+          <div id="semanticsList" class="semantics-list"></div>
+        </div>
+      </details>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>
